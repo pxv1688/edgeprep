@@ -99,6 +99,20 @@
   function dailyNumber() { return dayNo(new Date()) - dayNo(new Date(2026, 9, 1)) + 1; }
 
   /* ---------- problem widget (shared by Today and Bank) ---------- */
+  var BOOKMARK = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="miter"/></svg>';
+  var ACTIVE = null;
+  document.addEventListener("keydown", function (e) {
+    if (!ACTIVE || !document.body.contains(ACTIVE.el) || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target, typing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT");
+    if (typing) { if (e.key === "Escape") t.blur(); return; }
+    var el = ACTIVE.el, k = e.key.toLowerCase(), btn = null;
+    if (k === "h") btn = $("[data-a=hint]", el);
+    else if (k === "n") { btn = $("[data-a=next]", el); if (btn && btn.hidden) btn = null; }
+    else if (k === "s") btn = $("[data-a=save]", el);
+    else if (/^[1-4]$/.test(k) && !ACTIVE.done()) btn = $$(".opt", el)[+k - 1];
+    else if (k === "enter" && !ACTIVE.done()) { var inp = $("input", el); if (inp) { inp.focus(); e.preventDefault(); } return; }
+    if (btn && !btn.disabled) { e.preventDefault(); btn.click(); }
+  });
   function problemWidget(el, p, opts) {
     opts = opts || {};
     var answered = false;
@@ -111,8 +125,13 @@
     } else {
       body += '<div class="opts">' + p.opts.map(function (o, i) { return '<button class="opt" data-i="' + i + '"><span class="k">' + "ABCD"[i] + '</span>' + esc(o) + '</button>'; }).join("") + '</div>';
     }
-    body += (p.steps ? '<ol class="wsteps" hidden></ol>' : "") + '<p class="fb" aria-live="polite"></p><div class="row"><button class="btn alt" data-a="hint">' + (p.steps ? "Show a step" : "Show hint") + '</button><button class="btn alt" data-a="reveal">Reveal answer</button>' + (opts.next ? '<button class="btn" data-a="next" hidden>Next problem</button>' : "") + '</div><div class="ex" hidden></div>';
+    body += (p.steps ? '<ol class="wsteps" hidden></ol>' : "") + '<p class="fb" aria-live="polite"></p><div class="row"><button class="btn alt" data-a="hint">' + (p.steps ? "Show a step" : "Show hint") + '</button><button class="btn alt" data-a="reveal">Reveal answer</button>' + (opts.next ? '<button class="btn" data-a="next" hidden>Next problem</button>' : "") + '</div><div class="ex" hidden></div>' +
+      '<div class="ptools"><button class="btn alt sm" data-a="save" aria-pressed="' + !!(S.saved && S.saved[p.key]) + '">' + BOOKMARK + '<span>' + (S.saved && S.saved[p.key] ? "Saved" : "Save") + '</span></button>' +
+      '<details class="note"' + (S.notes && S.notes[p.key] ? " open" : "") + '><summary>My notes</summary><label class="sr" for="note-' + p.n + '">Notes for problem ' + p.n + '</label><textarea id="note-' + p.n + '" rows="3" placeholder="Your approach, mistakes to avoid, a trick to remember…">' + esc((S.notes && S.notes[p.key]) || "") + '</textarea></details>' +
+      '<p class="keys">Keys: ' + (p.type === "mc" ? "1–4 choose · " : "Enter check · ") + 'H ' + (p.steps ? "step" : "hint") + (opts.next ? " · N next" : "") + ' · S save</p></div>';
     el.innerHTML = body;
+    ACTIVE = {el: el, p: p, done: function () { return answered; }};
+    var noteT; $("textarea", el).addEventListener("input", function () { var v = this.value; clearTimeout(noteT); noteT = setTimeout(function () { S.notes = S.notes || {}; if (v.trim()) S.notes[p.key] = v; else delete S.notes[p.key]; save(); }, 400); });
     var fb = $(".fb", el), ex = $(".ex", el), tries = 0;
     function finish(ok, msg) {
       answered = true;
@@ -142,7 +161,14 @@
       }
     }
     el.onclick = function (e) {
-      var b = e.target.closest("button"); if (!b || answered && b.dataset.a !== "next") return;
+      var b = e.target.closest("button"); if (!b || answered && b.dataset.a !== "next" && b.dataset.a !== "save") return;
+      if (b.dataset.a === "save") {
+        S.saved = S.saved || {}; var on = !S.saved[p.key];
+        if (on) S.saved[p.key] = today(); else delete S.saved[p.key];
+        save(); b.setAttribute("aria-pressed", on); b.querySelector("span").textContent = on ? "Saved" : "Save";
+        toast(on ? "Saved. Find it under Train → Saved problems." : "Removed from saved problems.");
+        return;
+      }
       if (b.classList.contains("opt")) {
         var i = +b.dataset.i, ok = i === p.a;
         $$(".opt", el).forEach(function (o, j) { if (j === p.a) o.classList.add("right"); });
@@ -238,8 +264,8 @@
     }
   };
 
-  V.bank = function (app) {
-    var PAGE = 160, f = {set: "all", diff: 0, open: false, q: ""}, cur = null, page = 0;
+  V.bank = function (app, arg) {
+    var PAGE = 160, f = {set: "all", diff: 0, open: false, q: "", saved: arg === "saved"}, cur = null, page = 0;
     var total = BANK.length.toLocaleString();
     app.innerHTML =
       '<div class="stack"><h1>Problem Bank</h1><p class="lede">' + total + " problems across probability, brainteasers, options, statistics, code and mental math. Every square you solve turns yellow. Fractions like 3/8 are accepted.</p></div>" +
@@ -247,7 +273,7 @@
         '<section class="sheet pad stack" aria-label="Problems">' +
           '<div class="row"><label class="lab" for="bankQ" style="position:absolute;left:-9999px">Search problems</label><input class="field" id="bankQ" type="search" placeholder="Search: dice, Bayes, straddle, Python…" autocomplete="off" style="font-size:16px;font-weight:500"><button class="btn go" id="randBtn">Random unsolved</button></div>' +
           '<div class="filters" role="group" aria-label="Filter by set"><button class="chip" data-set="all" aria-pressed="true">All</button>' + SETS.map(function (s) { return '<button class="chip" data-set="' + s.id + '" aria-pressed="false">' + s.name + "</button>"; }).join("") + "</div>" +
-          '<div class="filters" role="group" aria-label="Filter by difficulty"><button class="chip" data-diff="0" aria-pressed="true">Any level</button><button class="chip" data-diff="1" aria-pressed="false">' + dots(1) + ' Warm-up</button><button class="chip" data-diff="2" aria-pressed="false">' + dots(2) + ' Interview</button><button class="chip" data-diff="3" aria-pressed="false">' + dots(3) + ' Hard</button><button class="chip" id="openOnly" aria-pressed="false">Unsolved only</button></div>' +
+          '<div class="filters" role="group" aria-label="Filter by difficulty"><button class="chip" data-diff="0" aria-pressed="true">Any level</button><button class="chip" data-diff="1" aria-pressed="false">' + dots(1) + ' Warm-up</button><button class="chip" data-diff="2" aria-pressed="false">' + dots(2) + ' Interview</button><button class="chip" data-diff="3" aria-pressed="false">' + dots(3) + ' Hard</button><button class="chip" id="openOnly" aria-pressed="false">Unsolved only</button><button class="chip" id="savedOnly" aria-pressed="' + f.saved + '">' + BOOKMARK + ' Saved</button></div>' +
           '<p class="sub num" id="count" aria-live="polite"></p><div class="bank" id="grid"></div>' +
           '<div class="row between" id="pager"><button class="btn alt" id="prevP">Previous</button><span class="sub num" id="pageN"></span><button class="btn alt" id="nextP">Next</button></div>' +
         "</section>" +
@@ -255,7 +281,7 @@
       "</div>";
     function list() {
       var q = f.q.toLowerCase();
-      return BANK.filter(function (p) { return (f.set === "all" || p.set === f.set) && (!f.diff || p.diff === f.diff) && (!f.open || !S.solved[p.key]) && (!q || (p.q + " " + (p.topic || "") + " " + setName(p.set)).toLowerCase().indexOf(q) >= 0); });
+      return BANK.filter(function (p) { return (f.set === "all" || p.set === f.set) && (!f.diff || p.diff === f.diff) && (!f.open || !S.solved[p.key]) && (!f.saved || (S.saved && S.saved[p.key])) && (!q || (p.q + " " + (p.topic || "") + " " + setName(p.set)).toLowerCase().indexOf(q) >= 0); });
     }
     function draw() {
       var L = list(), solved = 0; L.forEach(function (p) { if (S.solved[p.key]) solved++; });
@@ -264,7 +290,7 @@
       $("#grid").innerHTML = L.slice(page * PAGE, page * PAGE + PAGE).map(function (p) {
         var s = S.solved[p.key];
         return '<button class="cell' + (s ? " solved" : "") + (cur && cur.key === p.key ? " on" : "") + '" data-key="' + p.key + '" aria-label="Problem ' + p.n + ", " + setName(p.set) + (s ? ", solved" : "") + '"><sup>' + p.n + "</sup>" + (s ? CHECK : "") + "</button>";
-      }).join("") || '<p class="sub">No problems match. Clear the search or pick another set.</p>';
+      }).join("") || (f.saved && !Object.keys(S.saved || {}).length ? '<p class="sub">No saved problems yet. Press Save (or S) on any problem to keep it here.</p>' : '<p class="sub">No problems match. Clear the search or pick another set.</p>');
       $("#pageN").textContent = "Page " + (page + 1) + " of " + pages;
       $("#prevP").disabled = page === 0; $("#nextP").disabled = page >= pages - 1;
       $("#pager").hidden = pages < 2;
@@ -284,48 +310,97 @@
       if (b.dataset.set) { f.set = b.dataset.set; page = 0; $$("[data-set]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); draw(); }
       else if (b.dataset.diff !== undefined) { f.diff = +b.dataset.diff; page = 0; $$("[data-diff]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); draw(); }
       else if (b.id === "openOnly") { f.open = !f.open; page = 0; b.setAttribute("aria-pressed", f.open); draw(); }
+      else if (b.id === "savedOnly") { f.saved = !f.saved; page = 0; b.setAttribute("aria-pressed", f.saved); draw(); }
       else if (b.id === "prevP") { page--; draw(); $("#grid").scrollIntoView({block: "nearest"}); }
       else if (b.id === "nextP") { page++; draw(); $("#grid").scrollIntoView({block: "nearest"}); }
       else if (b.id === "randBtn") { var L = list().filter(function (q) { return !S.solved[q.key]; }); if (L.length) { var p = L[Math.random() * L.length | 0]; page = Math.floor(list().indexOf(p) / PAGE); open(p, true); } }
       else if (b.dataset.key) open(BY_KEY[b.dataset.key], true);
     });
-    open(BANK.filter(function (p) { return !S.solved[p.key]; })[0] || BANK[0]);
+    var first = list()[0] || BANK.filter(function (p) { return !S.solved[p.key]; })[0] || BANK[0];
+    open(first);
   };
 
   V.math = function (app) {
+    var OPS = ["+", "−", "×", "÷"], STD = {ops: "+−×÷", lvl: "medium", dur: 120};
+    var cfg = S.mathCfg || {ops: STD.ops, lvl: STD.lvl, dur: STD.dur};
+    function isStd() { return cfg.ops === STD.ops && cfg.lvl === STD.lvl && cfg.dur === STD.dur; }
+    function cfgKey() { return cfg.ops + "|" + cfg.lvl + "|" + cfg.dur; }
+    S.bestCustom = S.bestCustom || {};
+    function bestNow() { return isStd() ? S.best.math : (S.bestCustom[cfgKey()] || 0); }
     app.innerHTML =
-      '<div class="stack"><h1>Speed Math</h1><p class="lede">Two minutes. Addition, subtraction, multiplication and division with whole-number answers. Each answer submits itself the moment it is right.</p></div>' +
-      '<section class="sheet pad stack" style="max-width:760px">' +
-        '<div class="row between"><div><span class="sub">Time left</span><div class="big num" id="mT">120</div></div><div style="text-align:right"><span class="sub">Score</span><div class="big num" id="mS" style="color:var(--cobalt)">0</div></div></div>' +
+      '<div class="stack"><h1>Speed Math</h1><p class="lede">Whole-number arithmetic against the clock. Each answer submits itself the moment it\'s right. The Standard setup (all four operations, Medium, 2 minutes) counts toward your rating and personal best.</p></div>' +
+      '<div class="split">' +
+      '<section class="sheet pad stack" aria-label="Game">' +
+        '<div class="row between"><div><span class="sub">Time left</span><div class="big num" id="mT"></div></div><div style="text-align:right"><span class="sub">Score</span><div class="big num" id="mS" style="color:var(--cobalt)">0</div></div></div>' +
         '<div class="timebar"><i id="mBar" style="width:100%"></i></div>' +
         '<div class="prompt" id="mQ" aria-live="polite">Ready</div>' +
-        '<label class="lab" for="mA">Your answer</label><input class="field" id="mA" inputmode="numeric" autocomplete="off" disabled>' +
-        '<div class="row between"><button class="btn go" id="mGo">Start the clock</button><span class="sub num">Personal best: ' + S.best.math + "</span></div>" +
-      "</section>";
-    var ans, score, left;
+        '<div class="row"><label class="sr" for="mA">Your answer</label><input class="field" id="mA" inputmode="numeric" autocomplete="off" disabled placeholder="Answer"><button class="btn alt" id="mSkip" disabled title="Skip (Tab)">Skip</button></div>' +
+        '<div class="row between"><button class="btn go" id="mGo">Start the clock</button><span class="sub num" id="mBest"></span></div>' +
+        '<div id="mRes"></div>' +
+      "</section>" +
+      '<section class="sheet pad stack" aria-labelledby="msh"><h2 id="msh">Setup</h2>' +
+        '<fieldset class="fs"><legend class="lab">Operations</legend><div class="filters">' + OPS.map(function (o) { return '<label class="chip tog"><input type="checkbox" data-op="' + o + '"' + (cfg.ops.indexOf(o) >= 0 ? " checked" : "") + "> " + o + "</label>"; }).join("") + "</div></fieldset>" +
+        '<fieldset class="fs"><legend class="lab">Difficulty</legend><div class="filters">' + [["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(function (l) { return '<label class="chip tog"><input type="radio" name="mlvl" value="' + l[0] + '"' + (cfg.lvl === l[0] ? " checked" : "") + "> " + l[1] + "</label>"; }).join("") + "</div></fieldset>" +
+        '<fieldset class="fs"><legend class="lab">Length</legend><div class="filters">' + [[60, "1 min"], [120, "2 min"], [300, "5 min"], [480, "8 min"]].map(function (l) { return '<label class="chip tog"><input type="radio" name="mdur" value="' + l[0] + '"' + (cfg.dur === l[0] ? " checked" : "") + "> " + l[1] + "</label>"; }).join("") + "</div></fieldset>" +
+        '<p class="sub" id="mMode"></p><button class="btn alt" id="mStd">Reset to Standard</button>' +
+      "</section></div>";
+    var ans, op, score, left, running = false, shownAt, log;
+    function paintCfg() {
+      $("#mT").textContent = cfg.dur >= 60 ? Math.floor(cfg.dur / 60) + ":" + String(cfg.dur % 60).padStart(2, "0") : cfg.dur;
+      $("#mBest").textContent = (isStd() ? "Personal best: " : "Best with this setup: ") + bestNow();
+      $("#mMode").textContent = isStd() ? "Standard setup: counts toward your rating." : "Custom setup: practice only, with its own best score.";
+    }
+    function readCfg() {
+      var ops = $$("[data-op]").filter(function (c) { return c.checked; }).map(function (c) { return c.dataset.op; }).join("");
+      if (!ops) { ops = "+"; $$("[data-op]")[0].checked = true; }
+      cfg = {ops: ops, lvl: ($("[name=mlvl]:checked") || {}).value || "medium", dur: +(($("[name=mdur]:checked") || {}).value || 120)};
+      S.mathCfg = cfg; save(); paintCfg();
+    }
+    app.addEventListener("change", function (e) { if (!running && e.target.closest(".fs")) readCfg(); });
+    $("#mStd").onclick = function () { if (running) return; cfg = {ops: STD.ops, lvl: STD.lvl, dur: STD.dur}; S.mathCfg = cfg; save(); V.math(clearApp()); };
     function next() {
-      var op = "+−×÷"[Math.random() * 4 | 0], a, b;
-      if (op === "+") { a = rnd(12, 999); b = rnd(12, 999); ans = a + b; }
-      else if (op === "−") { a = rnd(60, 999); b = rnd(11, a); ans = a - b; }
-      else if (op === "×") { a = rnd(3, 99); b = rnd(3, 12); ans = a * b; }
-      else { b = rnd(3, 12); ans = rnd(3, 99); a = ans * b; }
-      $("#mQ").textContent = a + " " + op + " " + b; $("#mA").value = "";
+      op = cfg.ops[Math.random() * cfg.ops.length | 0]; var a, b, L = cfg.lvl;
+      if (op === "+") { if (L === "easy") { a = rnd(10, 99); b = rnd(10, 99); } else if (L === "medium") { a = rnd(12, 999); b = rnd(12, 999); } else { a = rnd(100, 9999); b = rnd(100, 9999); } ans = a + b; }
+      else if (op === "−") { if (L === "easy") { a = rnd(20, 99); b = rnd(10, a); } else if (L === "medium") { a = rnd(60, 999); b = rnd(11, a); } else { a = rnd(1000, 9999); b = rnd(100, a); } ans = a - b; }
+      else if (op === "×") { if (L === "easy") { a = rnd(2, 12); b = rnd(2, 12); } else if (L === "medium") { a = rnd(3, 99); b = rnd(3, 12); } else { a = rnd(11, 99); b = rnd(11, 99); } ans = a * b; }
+      else { if (L === "easy") { b = rnd(2, 12); ans = rnd(2, 12); } else if (L === "medium") { b = rnd(3, 12); ans = rnd(3, 99); } else { b = rnd(11, 49); ans = rnd(11, 99); } a = ans * b; }
+      $("#mQ").textContent = a + " " + op + " " + b; $("#mA").value = ""; shownAt = performance.now();
+    }
+    function record(ok) { log.push({op: op, ok: ok, t: (performance.now() - shownAt) / 1000}); }
+    function finish() {
+      running = false; clearTimers(); $("#mA").disabled = true; $("#mSkip").disabled = true;
+      $$(".fs input").forEach(function (c) { c.disabled = false; }); $("#mStd").disabled = false;
+      var g = $("#mGo"); g.disabled = false; g.textContent = "Play again";
+      var pb = score > bestNow();
+      if (isStd()) {
+        if (pb) S.best.math = score;
+        S.runs = (S.runs || []).concat([{d: today(), s: score}]).slice(-60);
+        S.r.math = Math.round(S.r.math * 0.6 + (600 + score * 16) * 0.4);
+      } else if (pb) S.bestCustom[cfgKey()] = score;
+      credit(null, score > 0, isStd() ? score * 2 : score);
+      $("#mQ").textContent = pb && score > 0 ? "New best: " + score : "Score: " + score;
+      var by = {}; log.forEach(function (x) { var o = by[x.op] = by[x.op] || {n: 0, ok: 0, t: 0}; o.n++; if (x.ok) { o.ok++; o.t += x.t; } });
+      var rows = Object.keys(by).map(function (k) { var o = by[k]; return {op: k, ok: o.ok, skip: o.n - o.ok, avg: o.ok ? o.t / o.ok : null}; });
+      var slow = rows.filter(function (r) { return r.avg != null; }).sort(function (a, b) { return b.avg - a.avg; })[0];
+      $("#mRes").innerHTML = rows.length ? '<div class="ex"><b>Breakdown</b><div class="scroll-x"><table class="tbl"><thead><tr><th scope="col">Operation</th><th scope="col" class="r">Correct</th><th scope="col" class="r">Skipped</th><th scope="col" class="r">Avg time</th></tr></thead><tbody>' +
+        rows.map(function (r) { return "<tr><th scope=\"row\">" + r.op + '</th><td class="r">' + r.ok + '</td><td class="r">' + r.skip + '</td><td class="r">' + (r.avg != null ? r.avg.toFixed(1) + "s" : "–") + "</td></tr>"; }).join("") +
+        "</tbody></table></div>" + (slow && rows.length > 1 ? "<p>Slowest: <b>" + slow.op + "</b> at " + slow.avg.toFixed(1) + "s per answer. Try a custom run with only " + slow.op + " to drill it.</p>" : "") + "</div>" : "";
+      paintCfg();
     }
     $("#mGo").onclick = function () {
-      score = 0; left = 120; $("#mS").textContent = 0; $("#mA").disabled = false; $("#mA").focus(); this.disabled = true; next();
+      readCfg(); score = 0; left = cfg.dur; log = []; running = true; $("#mRes").innerHTML = "";
+      $("#mS").textContent = 0; $("#mA").disabled = false; $("#mSkip").disabled = false; $("#mA").focus(); this.disabled = true;
+      $$(".fs input").forEach(function (c) { c.disabled = true; }); $("#mStd").disabled = true;
+      next();
       timers.push(setInterval(function () {
-        left--; $("#mT").textContent = left; $("#mBar").style.width = (left / 120 * 100) + "%";
-        if (left <= 0) {
-          clearTimers(); $("#mA").disabled = true; var g = $("#mGo"); g.disabled = false; g.textContent = "Play again";
-          var pb = score > S.best.math; if (pb) S.best.math = score;
-          S.runs = (S.runs || []).concat([{d: today(), s: score}]).slice(-60);
-          S.r.math = Math.round(S.r.math * 0.6 + (600 + score * 16) * 0.4);
-          credit(null, score > 0, score * 2);
-          $("#mQ").textContent = pb ? "New best: " + score : "Score: " + score;
-        }
+        left--; $("#mT").textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0"); $("#mBar").style.width = (left / cfg.dur * 100) + "%";
+        if (left <= 0) finish();
       }, 1000));
     };
-    $("#mA").addEventListener("input", function () { if (this.value.trim() !== "" && +this.value === ans) { score++; $("#mS").textContent = score; next(); } });
+    $("#mSkip").onclick = function () { if (!running) return; record(false); next(); $("#mA").focus(); };
+    $("#mA").addEventListener("keydown", function (e) { if (e.key === "Tab" && running) { e.preventDefault(); $("#mSkip").click(); } });
+    $("#mA").addEventListener("input", function () { if (running && this.value.trim() !== "" && +this.value === ans) { record(true); score++; $("#mS").textContent = score; next(); } });
+    paintCfg();
   };
 
   V.market = function (app) {
@@ -435,6 +510,7 @@
   function gameList() {
     return [
       ["rush", "Puzzle Rush", "Three minutes, three strikes. Problems get harder as your score climbs.", "Best " + (S.best.rush || 0), "prob"],
+      ["mock", "Mock assessment", "20 mixed questions in 20 minutes, scored at the end like an online test.", S.mocks && S.mocks.length ? S.mocks.length + " taken" : "Not taken yet", "desk"],
       ["math", "Speed Math", "Two minutes of arithmetic under the clock, the way trading firms test it.", "Best " + S.best.math, "math"],
       ["market", "Make a Market", "Quote a bid and an ask on numbers you don't know. Tight and right scores.", MARKETS.length + " markets", "mm"],
       ["bet", "Betting Table", "A coin that lands heads 60% of the time. Size your bets or go broke.", "30 flips", "bet"],
@@ -456,7 +532,7 @@
   function whenReady(fn) { if (document.readyState === "complete") fn(); else addEventListener("load", fn, {once: true}); }
 
   V.games = function (app) {
-    app.innerHTML = '<div class="stack"><h1>Games</h1><p class="lede">Five formats that drill what interviews test under pressure. Each one moves its own rating.</p></div>' + clueRows(gameList()).replace('class="clues"', 'class="clues two"');
+    app.innerHTML = '<div class="stack"><h1>Games</h1><p class="lede">Six formats that drill what interviews test under pressure. Each one moves its own rating.</p></div>' + clueRows(gameList()).replace('class="clues"', 'class="clues two"');
   };
 
   V.stats = function (app) {
@@ -668,6 +744,10 @@
   V.train = function (app) {
     app.innerHTML = '<div class="stack"><h1>Train</h1><p class="lede">Structured practice: review what you missed, follow a study track, or drill at your level.</p></div>' + planSection(true) +
       '<section class="stack" aria-labelledby="tt"><div class="row between"><h2 id="tt">Study tracks</h2><a class="sub" href="#tracks">All tracks</a></div>' + trackList() + "</section>" +
+      '<section class="stack" aria-labelledby="ts"><h2 id="ts">More ways to train</h2><div class="plans">' +
+        '<a class="plan" href="#saved"><span class="n">' + Object.keys(S.saved || {}).length + '</span><span><h3>Saved problems</h3><p>Problems you bookmarked, with your notes.</p></span></a>' +
+        '<a class="plan" href="#mock"><span class="n">' + (S.mocks && S.mocks.length ? Math.max.apply(null, S.mocks.map(function (m) { return Math.round(100 * m.score / m.total); })) + "%" : "–") + '</span><span><h3>Mock assessment</h3><p>20 questions, 20 minutes, no feedback until the end.</p></span></a>' +
+      "</div></section>" +
       '<section class="stack" aria-labelledby="ta"><div class="row between"><h2 id="ta">Daily archive</h2><a class="sub" href="#archive">Open archive</a></div><p class="sub">Missed a day? Every past daily puzzle is playable in the archive.</p></section>';
   };
   function trackList() {
@@ -850,6 +930,84 @@
     render();
   };
 
+
+  /* ---------- mock assessment ---------- */
+  V.mock = function (app) {
+    var DUR = 20 * 60, qs = [], ans = {}, cur = 0, left = DUR, running = false, started = 0;
+    function pickSet(pred, n) { return shuffle(BANK.filter(pred)).slice(0, n); }
+    function build() {
+      var quick = ["mul2", "pctof", "tofrac", "square"];
+      qs = [].concat(
+        pickSet(function (p) { return p.set === "mental" && quick.indexOf(p.key.split("-")[0]) >= 0; }, 5).map(function (p) { return {p: p, sec: "Mental math"}; }),
+        pickSet(function (p) { return p.key.indexOf("seq-") === 0 && p.diff <= 2; }, 4).map(function (p) { return {p: p, sec: "Sequences"}; }),
+        pickSet(function (p) { return p.set === "prob" && p.type === "num" && p.diff <= 2 && NO_RUSH.indexOf(p.key.split("-")[0]) < 0; }, 6).map(function (p) { return {p: p, sec: "Probability"}; }),
+        pickSet(function (p) { return p.type === "mc"; }, 5).map(function (p) { return {p: p, sec: "Options, stats & code"}; })
+      );
+    }
+    function intro() {
+      var hist = (S.mocks || []).slice(-5).reverse();
+      app.innerHTML = '<div class="stack"><h1>Mock assessment</h1><p class="lede">20 questions in 20 minutes: mental math, number sequences, probability, and options, stats and code. Like a real online test, you won\'t see whether you\'re right until you submit. Skip freely and come back.</p></div>' +
+        '<section class="sheet pad stack" style="max-width:760px"><dl class="stats" style="margin:0"><div><dt>Questions</dt><dd class="num">20</dd></div><div><dt>Time</dt><dd class="num">20:00</dd></div><div><dt>Best score</dt><dd class="num">' + (hist.length ? Math.max.apply(null, (S.mocks || []).map(function (m) { return m.score; })) + "/20" : "–") + "</dd></div></dl>" +
+        '<div class="row"><button class="btn go big-btn" id="mkGo">Start the test</button></div>' +
+        (hist.length ? '<div class="scroll-x"><table class="tbl"><thead><tr><th scope="col">Date</th><th scope="col" class="r">Score</th><th scope="col" class="r">Time used</th></tr></thead><tbody>' + hist.map(function (m) { return "<tr><td>" + m.d + '</td><td class="r">' + m.score + "/" + m.total + '</td><td class="r">' + Math.floor(m.secs / 60) + ":" + String(m.secs % 60).padStart(2, "0") + "</td></tr>"; }).join("") + "</tbody></table></div>" : "") + "</section>";
+      $("#mkGo").onclick = start;
+    }
+    function start() {
+      build(); ans = {}; cur = 0; left = DUR; running = true; started = Date.now();
+      app.innerHTML = '<section class="sheet pad stack mock" aria-label="Mock assessment">' +
+        '<div class="row between"><b id="mkPos"></b><span class="big num mk-t" id="mkT">20:00</span></div><div class="timebar"><i id="mkBar" style="width:100%"></i></div>' +
+        '<div class="bank mk-nav" id="mkNav" aria-label="Questions"></div>' +
+        '<p class="meta" id="mkSec"></p><p class="today-q" id="mkQ"></p><div id="mkA"></div>' +
+        '<div class="row between"><div class="row"><button class="btn alt" id="mkPrev">Previous</button><button class="btn" id="mkNext">Next</button></div><button class="btn go" id="mkSubmit">Submit test</button></div>' +
+        '<div id="mkConfirm" class="callout" hidden><p id="mkLeft"></p><div class="row" style="margin-top:10px"><button class="btn go" id="mkYes">Submit now</button><button class="btn alt" id="mkNo">Keep working</button></div></div></section>';
+      timers.push(setInterval(function () { left--; $("#mkT").textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0"); $("#mkBar").style.width = (100 * left / DUR) + "%"; if (left <= 0) finish(); }, 1000));
+      $("#mkPrev").onclick = function () { saveCur(); show(cur - 1); };
+      $("#mkNext").onclick = function () { saveCur(); show(cur + 1); };
+      $("#mkSubmit").onclick = function () { saveCur(); var blank = qs.length - Object.keys(ans).length; if (!blank) return finish(); $("#mkLeft").textContent = blank + " question" + (blank > 1 ? "s are" : " is") + " unanswered."; $("#mkConfirm").hidden = false; };
+      $("#mkYes").onclick = finish; $("#mkNo").onclick = function () { $("#mkConfirm").hidden = true; };
+      $("#mkNav").onclick = function (e) { var b = e.target.closest("[data-q]"); if (b) { saveCur(); show(+b.dataset.q); } };
+      show(0);
+    }
+    function nav() { $("#mkNav").innerHTML = qs.map(function (q, i) { var a = ans[i] != null && ans[i] !== ""; return '<button class="cell' + (a ? " answered" : "") + (i === cur ? " on" : "") + '" data-q="' + i + '" aria-label="Question ' + (i + 1) + (a ? ", answered" : "") + '"><sup>' + (i + 1) + "</sup></button>"; }).join(""); }
+    function saveCur() { var q = qs[cur]; if (!q || q.p.type !== "num") return; var v = $("#mkInp"); if (v) { if (v.value.trim()) ans[cur] = v.value.trim(); else delete ans[cur]; } }
+    function show(i) {
+      cur = Math.max(0, Math.min(qs.length - 1, i)); var q = qs[cur], p = q.p;
+      $("#mkPos").textContent = "Question " + (cur + 1) + " of " + qs.length; $("#mkSec").textContent = q.sec; $("#mkQ").textContent = p.q;
+      if (p.type === "num") {
+        $("#mkA").innerHTML = '<label class="sr" for="mkInp">Your answer</label><input class="field" id="mkInp" autocomplete="off" inputmode="decimal" placeholder="Answer, then Enter for next">';
+        $("#mkInp").value = ans[cur] || ""; $("#mkInp").focus();
+        $("#mkInp").onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); saveCur(); if (cur < qs.length - 1) show(cur + 1); else { nav(); } } };
+      } else {
+        $("#mkA").innerHTML = '<div class="opts">' + p.opts.map(function (o, k) { return '<button class="opt' + (ans[cur] === k ? " picked" : "") + '" data-k="' + k + '"><span class="k">' + "ABCD"[k] + "</span>" + esc(o) + "</button>"; }).join("") + "</div>";
+        $("#mkA").onclick = function (e) { var b = e.target.closest("[data-k]"); if (!b) return; ans[cur] = +b.dataset.k; $$(".opt", $("#mkA")).forEach(function (o) { o.classList.toggle("picked", o === b); }); nav(); };
+      }
+      $("#mkPrev").disabled = cur === 0; $("#mkNext").disabled = cur === qs.length - 1;
+      nav();
+    }
+    function finish() {
+      if (!running) return; running = false; clearTimers(); saveCur();
+      var secs = Math.min(DUR, Math.round((Date.now() - started) / 1000)), score = 0, bySec = {};
+      var rows = qs.map(function (q, i) {
+        var p = q.p, a = ans[i], ok = false;
+        if (a != null && a !== "") ok = p.type === "num" ? (!isNaN(parseNum(a)) && close(parseNum(a), p)) : a === p.a;
+        var s = bySec[q.sec] = bySec[q.sec] || {n: 0, ok: 0}; s.n++;
+        if (ok) { score++; s.ok++; var firstTime = !S.solved[p.key]; S.solved[p.key] = true; credit(skillOf(p), true, firstTime ? 8 : 2); }
+        else if (a != null && a !== "") schedule(p, false);
+        return {p: p, a: a, ok: ok};
+      });
+      S.mocks = (S.mocks || []).concat([{d: today(), score: score, total: qs.length, secs: secs}]).slice(-50); save();
+      app.innerHTML = '<div class="stack"><h1>Score: ' + score + "/" + qs.length + '</h1><p class="lede">Time used ' + Math.floor(secs / 60) + ":" + String(secs % 60).padStart(2, "0") + ". Questions you answered wrong were added to your review queue.</p></div>" +
+        '<dl class="stats" style="margin:0">' + Object.keys(bySec).map(function (k) { return "<div><dt>" + k + '</dt><dd class="num">' + bySec[k].ok + "/" + bySec[k].n + "</dd></div>"; }).join("") + "</dl>" +
+        '<section class="sheet pad stack"><h2>Review your answers</h2><ol class="mk-review">' + rows.map(function (r) {
+          var p = r.p, given = r.a == null || r.a === "" ? "No answer" : (p.type === "mc" ? p.opts[r.a] : r.a);
+          return '<li class="' + (r.ok ? "ok" : "miss") + '"><p class="q">' + esc(p.q) + '</p><p><span class="tag-' + (r.ok ? "ok" : "miss") + '">' + (r.ok ? "Correct" : "Missed") + "</span> Your answer: <b>" + esc(given) + "</b>" + (r.ok ? "" : " · Correct: <b>" + esc(p.type === "num" ? fmt(p.a) : p.opts[p.a]) + "</b>") + "</p>" + (r.ok ? "" : '<p class="sub">' + esc(p.ex) + "</p>") + "</li>";
+        }).join("") + '</ol><div class="row"><button class="btn go" id="mkAgain">Take another test</button><a class="btn alt" href="#review" style="text-decoration:none">Go to review</a></div></section>';
+      $("#mkAgain").onclick = function () { V.mock(clearApp()); };
+      scrollTo(0, 0);
+    }
+    intro();
+  };
+
   /* ---------- router ---------- */
   function clearApp() { clearTimers(); var app = $("#app"), fresh = app.cloneNode(false); app.parentNode.replaceChild(fresh, app); return fresh; }
   function route() {
@@ -857,8 +1015,9 @@
     if (!S.onboarded && Object.keys(S.solved).length) { S.onboarded = true; save(); }
     if (!S.onboarded && (id === "today" || id === "")) id = "start";
     if (id.indexOf("track-") === 0) { arg = id.slice(6); id = "track"; }
+    if (id === "saved") { arg = "saved"; id = "bank"; }
     if (!V[id]) id = "today";
-    var navId = ["math", "market", "bet", "quiz", "rush"].indexOf(id) >= 0 ? "games" : ["practice", "review", "tracks", "track", "archive"].indexOf(id) >= 0 ? "train" : id;
+    var navId = ["math", "market", "bet", "quiz", "rush", "mock"].indexOf(id) >= 0 ? "games" : ["practice", "review", "tracks", "track", "archive"].indexOf(id) >= 0 ? "train" : id;
     $$(".nav a").forEach(function (a) { if (a.getAttribute("href") === "#" + navId) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     var app = clearApp(); V[id](app, arg); scrollTo(0, 0);
   }

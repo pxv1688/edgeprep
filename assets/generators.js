@@ -169,6 +169,62 @@
   for (n = 5; n <= 50; n++) add("shake", "Counting", "brain", 1, n + " people each shake hands once with every other person. How many handshakes happen?", C(n, 2), "Choose pairs.", "C(" + n + ",2) = " + C(n, 2) + ".", {exact: true});
   for (n = 5; n <= 25; n++) add("diag", "Counting", "brain", 1, "How many diagonals does a " + n + "-sided convex polygon have?", n * (n - 3) / 2, "Each vertex connects to n − 3 others.", n + " × " + (n - 3) + " / 2 = " + (n * (n - 3) / 2) + ".", {exact: true});
 
+  /* ================= SEQUENCES (next-term questions from online assessments) ================= */
+  function diffs(a) { var d = []; for (var i = 1; i < a.length; i++) d.push(a[i] - a[i - 1]); return d; }
+  function seqQ(terms) { return "What number comes next? " + terms.join(", ") + ", …"; }
+  function seqAdd(kind, diff, terms, next, hint, ex, extra) {
+    var d1 = diffs(terms), d2 = diffs(d1);
+    var steps = ["Write the sequence: " + terms.join(", ") + ".", "First differences: " + d1.join(", ") + ".", "Second differences: " + d2.join(", ") + "."].concat(extra || []).concat(["The pattern gives " + next + "."]);
+    add("seq-" + kind, "Sequences", "brain", diff, seqQ(terms), next, hint, ex, {exact: true, steps: steps});
+  }
+  [3, 7, 12, 25, 40, -5].forEach(function (a) { [4, 6, 9, 11, 13, -7, -3, 15].forEach(function (d) {
+    var t = []; for (var i = 0; i < 5; i++) t.push(a + i * d);
+    seqAdd("arith", 1, t, a + 5 * d, "Look at the gap between neighbors.", "Each term changes by " + d + ", so the next is " + t[4] + " " + (d < 0 ? "− " + (-d) : "+ " + d) + " = " + (a + 5 * d) + ".");
+  }); });
+  [1, 2, 3, 5, 7].forEach(function (a) { [2, 3, -2, 4].forEach(function (r) {
+    var t = []; for (var i = 0; i < 5; i++) t.push(a * Math.pow(r, i));
+    seqAdd("geo", 1, t, a * Math.pow(r, 5), "Try dividing each term by the one before.", "Each term is the previous one times " + r + ": " + t[4] + " × " + r + " = " + (a * Math.pow(r, 5)) + ".", ["Ratios between neighbors are all " + r + ", so it's geometric."]);
+  }); });
+  [1, 2, 3].forEach(function (p) { [0, 1, -2].forEach(function (q) { [0, 3, 5].forEach(function (r) {
+    var f = function (n) { return p * n * n + q * n + r; }, t = []; for (var n = 1; n <= 5; n++) t.push(f(n));
+    seqAdd("quad", 2, t, f(6), "The gaps themselves grow steadily. Check the second differences.", "The second differences are constant (" + (2 * p) + "), so the next gap is " + (f(6) - f(5)) + " and the next term is " + f(5) + " + " + (f(6) - f(5)) + " = " + f(6) + ".", ["Constant second differences mean a quadratic: the next first difference is " + (f(5) - f(4)) + " + " + (2 * p) + " = " + (f(6) - f(5)) + "."]);
+  }); }); });
+  [-1, 0, 1, 2, 5].forEach(function (c) {
+    var t = []; for (var n = 1; n <= 5; n++) t.push(n * n * n + c);
+    seqAdd("cube", 2, t, 216 + c, "Compare each term with 1, 8, 27, 64, 125.", "These are cubes " + (c ? (c > 0 ? "plus " + c : "minus " + (-c)) : "") + ": 6³" + (c ? (c > 0 ? " + " + c : " − " + (-c)) : "") + " = " + (216 + c) + ".", ["Third differences are constant (6), the signature of cubes."]);
+  });
+  (function () { var t = []; for (var n = 1; n <= 5; n++) t.push(n * n * n - n); seqAdd("cube", 3, t, 216 - 6, "Compare with the cubes 1, 8, 27, 64, 125.", "Each term is n³ − n: 6³ − 6 = 210."); })();
+  [[1, 1], [2, 3], [1, 4], [3, 5], [2, 7], [5, 8], [4, 1], [1, 3], [10, 10], [3, 2]].forEach(function (s) {
+    var t = [s[0], s[1]]; while (t.length < 6) t.push(t[t.length - 1] + t[t.length - 2]);
+    seqAdd("fib", 2, t, t[4] + t[5], "Each term may depend on the two before it.", "Each term is the sum of the previous two: " + t[4] + " + " + t[5] + " = " + (t[4] + t[5]) + ".", ["The differences repeat the sequence itself, a sign of a Fibonacci-style rule."]);
+  });
+  [[1, 1, 2], [0, 1, 1], [2, 1, 3], [1, 2, 3]].forEach(function (s) {
+    var t = s.slice(); while (t.length < 7) t.push(t[t.length - 1] + t[t.length - 2] + t[t.length - 3]);
+    var nx = t[4] + t[5] + t[6];
+    seqAdd("trib", 3, t, nx, "Try adding the previous three terms.", "Each term is the sum of the previous three: " + t[4] + " + " + t[5] + " + " + t[6] + " = " + nx + ".");
+  });
+  [[1, 3, 10, -2], [2, 5, 20, -3], [5, 2, 1, 4], [10, 10, 3, 3], [0, 4, 50, -5], [7, -1, 2, 6]].forEach(function (x) {
+    [6, 7].forEach(function (len) {
+      var t = []; for (var i = 0; i < len; i++) t.push(i % 2 === 0 ? x[0] + (i / 2) * x[1] : x[2] + ((i - 1) / 2) * x[3]);
+      var i2 = len, nx = i2 % 2 === 0 ? x[0] + (i2 / 2) * x[1] : x[2] + ((i2 - 1) / 2) * x[3];
+      seqAdd("alt", 2, t, nx, "Look at every other term.", "Two sequences are interleaved. Odd positions go " + x[0] + ", " + (x[0] + x[1]) + ", … (step " + x[1] + "); even positions go " + x[2] + ", " + (x[2] + x[3]) + ", … (step " + x[3] + "). The next term is " + nx + ".", ["Split into odd and even positions; each is arithmetic."]);
+    });
+  });
+  [2, 3].forEach(function (m) { [1, -1, 2, 3].forEach(function (c) { [1, 2, 3].forEach(function (s0) {
+    var t = [s0]; while (t.length < 5) t.push(m * t[t.length - 1] + c);
+    if (t[1] === t[0]) return; /* a fixed point (e.g. 1, 1, 1, …) isn't a real puzzle */
+    var nx = m * t[4] + c;
+    seqAdd("lin", 2, t, nx, "Try multiplying the previous term, then adjusting.", "Each term is " + m + " × previous " + (c < 0 ? "− " + (-c) : "+ " + c) + ": " + m + " × " + t[4] + (c < 0 ? " − " + (-c) : " + " + c) + " = " + nx + ".", ["The differences grow by a factor of " + m + ", which points to a rule of the form x → " + m + "x + c."]);
+  }); }); });
+  [1, 2, 4, 5, 10].forEach(function (s0) {
+    var t = [s0]; for (var n = 1; t.length < 6; n++) t.push(t[t.length - 1] + n);
+    seqAdd("tri", 1, t, t[5] + 6, "Look at the differences.", "The gaps are 1, 2, 3, 4, 5, so the next gap is 6: " + t[5] + " + 6 = " + (t[5] + 6) + ".");
+  });
+  [0, 1, -1, 2, 10].forEach(function (k) {
+    var pr = [2, 3, 5, 7, 11, 13, 17], t = pr.slice(0, 6).map(function (x) { return x + k; });
+    seqAdd("prime", 2, t, 17 + k, "Compare with 2, 3, 5, 7, 11, 13.", "These are the primes" + (k ? (k > 0 ? " plus " + k : " minus " + (-k)) : "") + ". The next prime is 17, so the next term is " + (17 + k) + ".");
+  });
+
   /* ================= MENTAL MATH ================= */
   for (a = 12; a <= 99; a += 7) for (b = 13; b <= 99; b += 11) add("mul2", "Multiplication", "mental", 1, "What is " + a + " × " + b + "?", a * b, "Split one factor into tens and units.", a + " × " + b + " = " + (a * b).toLocaleString() + ".", {exact: true});
   [5, 12, 15, 18, 25, 35, 45, 65, 75, 85, 95].forEach(function (p) { [40, 60, 80, 120, 240, 360, 480, 720].forEach(function (x) { var v = Math.round(p * x) / 100;

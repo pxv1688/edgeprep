@@ -10,6 +10,11 @@
   }
   if (window.EdgeAuth) window.EdgeAuth.onChange(paint); else paint(null);
 
+  /* offline support and app install (needs http(s); skipped when opened as a file) */
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+
   var sel = document.getElementById("themeSel");
   if (sel) {
     var cur = "system";

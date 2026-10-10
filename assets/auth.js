@@ -56,6 +56,11 @@
     if (remote.wk && (!local.wk || remote.wk.start > local.wk.start || (remote.wk.start === local.wk.start && remote.wk.xp > local.wk.xp))) out.wk = remote.wk;
     if (remote.wkPrev && (!local.wkPrev || remote.wkPrev.xp > local.wkPrev.xp)) out.wkPrev = remote.wkPrev;
     out.leagueTop10 = !!(local.leagueTop10 || remote.leagueTop10);
+    out.saved = out.saved || {}; for (k in remote.saved || {}) if (!out.saved[k]) out.saved[k] = remote.saved[k];
+    out.notes = out.notes || {}; for (k in remote.notes || {}) if (!out.notes[k]) out.notes[k] = remote.notes[k];
+    if ((remote.mocks || []).length > (local.mocks || []).length) out.mocks = remote.mocks;
+    out.bestCustom = out.bestCustom || {}; for (k in remote.bestCustom || {}) out.bestCustom[k] = Math.max(out.bestCustom[k] || 0, remote.bestCustom[k]);
+    out.mathCfg = local.mathCfg || remote.mathCfg;
     out.goal = local.goal || remote.goal;
     out.profile = local.profile && local.profile.name ? local.profile : (remote.profile || local.profile);
     for (k in remote) if (k.indexOf("trk_") === 0 && remote[k]) out[k] = true;
