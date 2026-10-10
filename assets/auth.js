@@ -31,6 +31,23 @@
     });
   };
   A.league = function (week) { return need().then(function () { return sb.rpc("league", {p_week: week || null}).then(unwrap); }); };
+  /* problem reports and feedback: anyone can send, only the site owner can read (see schema.sql) */
+  A.sendFeedback = function (f) {
+    return need().then(function () {
+      return sb.from("feedback").insert({
+        kind: f.kind, message: String(f.message).slice(0, 2000), problem_key: f.problem_key || null,
+        contact: f.contact ? String(f.contact).slice(0, 254) : null, page: String(f.page || location.pathname + location.hash).slice(0, 200)
+      }).then(unwrap);
+    });
+  };
+  A.subscribe = function (email, source) {
+    return need().then(function () {
+      return sb.from("subscribers").insert({email: String(email).trim().toLowerCase(), source: source || null}).then(function (r) {
+        if (r.error) { if (r.error.code === "23505") return "exists"; throw r.error; }
+        return "ok";
+      });
+    });
+  };
   A.leaderboard = function () { return need().then(function () { return sb.rpc("leaderboard").then(unwrap); }); };
   A.deleteAccount = function () { return need().then(function () { return sb.rpc("delete_me").then(unwrap); }).then(function () { return sb.auth.signOut(); }); };
 
@@ -84,6 +101,7 @@
       push();
     });
   }
+  A.merge = merge;
   window.EdgeSync = {queue: function () { if (!ok || !A.user || pulling) return; clearTimeout(timer); timer = setTimeout(push, 1500); }};
   A.pullProgress = pull;
 

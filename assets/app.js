@@ -12,7 +12,11 @@
   var S = {xp: 0, solved: {}, days: {}, r: {math: 1000, prob: 1000, mm: 1000, bet: 1000, desk: 1000}, best: {math: 0}, daily: {}, noticed: false};
   try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) { for (var k in saved) S[k] = saved[k]; } } catch (e) {}
   if (S.v !== 3) { var mig = {}; for (var sk in S.solved) mig[/^\d+$/.test(sk) ? "c-" + sk : sk] = true; S.solved = mig; S.v = 3; }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (window.EdgeSync) window.EdgeSync.queue(); }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); }
+    catch (e) { if (!save.warned) { save.warned = true; setTimeout(function () { toast("Your browser isn't saving progress (private browsing or full storage). Download a backup from Profile."); }, 500); } }
+    if (window.EdgeSync) window.EdgeSync.queue();
+  }
   window.EdgeState = {
     get: function () { return S; },
     replace: function (next) { S = next; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} hud(); route(); },
@@ -54,6 +58,7 @@
     if (xp > 0) ensureWeek().xp += xp;
     if (ok) {
       S.days[today()] = (S.days[today()] || 0) + 1;
+      if (!S.persistAsked && navigator.storage && navigator.storage.persist) { S.persistAsked = true; navigator.storage.persist().catch(function () {}); }
       if (S.days[today()] === goal()) setTimeout(function () { toast("Daily goal reached: " + goal() + " solved today."); }, 600);
       var s = streak();
       if (s > 0 && s % 7 === 0 && S.freezeDay !== today()) { S.freezeDay = today(); if ((S.freezes || 0) < 2) { S.freezes = (S.freezes || 0) + 1; setTimeout(function () { toast(s + "-day streak! You earned a streak freeze."); }, 1200); } }
@@ -128,10 +133,12 @@
     body += (p.steps ? '<ol class="wsteps" hidden></ol>' : "") + '<p class="fb" aria-live="polite"></p><div class="row"><button class="btn alt" data-a="hint">' + (p.steps ? "Show a step" : "Show hint") + '</button><button class="btn alt" data-a="reveal">Reveal answer</button>' + (opts.next ? '<button class="btn" data-a="next" hidden>Next problem</button>' : "") + '</div><div class="ex" hidden></div>' +
       '<div class="ptools"><button class="btn alt sm" data-a="save" aria-pressed="' + !!(S.saved && S.saved[p.key]) + '">' + BOOKMARK + '<span>' + (S.saved && S.saved[p.key] ? "Saved" : "Save") + '</span></button>' +
       '<details class="note"' + (S.notes && S.notes[p.key] ? " open" : "") + '><summary>My notes</summary><label class="sr" for="note-' + p.n + '">Notes for problem ' + p.n + '</label><textarea id="note-' + p.n + '" rows="3" placeholder="Your approach, mistakes to avoid, a trick to remember…">' + esc((S.notes && S.notes[p.key]) || "") + '</textarea></details>' +
+      '<details class="report"><summary>Report a problem</summary><div class="stack rep-box"><label class="lab" for="repk-' + p.n + '">What\'s wrong?</label><select id="repk-' + p.n + '"><option value="wrong_answer">The answer is wrong</option><option value="unclear">The question is unclear</option><option value="typo">Typo or formatting</option><option value="other">Something else</option></select>' +
+      '<label class="lab" for="repm-' + p.n + '">Details</label><textarea id="repm-' + p.n + '" class="rep-msg" rows="2" maxlength="2000" placeholder="e.g. I think the answer is 3/8 because…"></textarea><div class="row"><button class="btn sm" data-a="report-send">Send report</button></div><p class="fb rep-fb" aria-live="polite"></p></div></details>' +
       '<p class="keys">Keys: ' + (p.type === "mc" ? "1–4 choose · " : "Enter check · ") + 'H ' + (p.steps ? "step" : "hint") + (opts.next ? " · N next" : "") + ' · S save</p></div>';
     el.innerHTML = body;
     ACTIVE = {el: el, p: p, done: function () { return answered; }};
-    var noteT; $("textarea", el).addEventListener("input", function () { var v = this.value; clearTimeout(noteT); noteT = setTimeout(function () { S.notes = S.notes || {}; if (v.trim()) S.notes[p.key] = v; else delete S.notes[p.key]; save(); }, 400); });
+    var noteT; $(".note textarea", el).addEventListener("input", function () { var v = this.value; clearTimeout(noteT); noteT = setTimeout(function () { S.notes = S.notes || {}; if (v.trim()) S.notes[p.key] = v; else delete S.notes[p.key]; save(); }, 400); });
     var fb = $(".fb", el), ex = $(".ex", el), tries = 0;
     function finish(ok, msg) {
       answered = true;
@@ -161,7 +168,17 @@
       }
     }
     el.onclick = function (e) {
-      var b = e.target.closest("button"); if (!b || answered && b.dataset.a !== "next" && b.dataset.a !== "save") return;
+      var b = e.target.closest("button"); if (!b || answered && ["next", "save", "report-send"].indexOf(b.dataset.a) < 0) return;
+      if (b.dataset.a === "report-send") {
+        var box = $(".report", el), msg = $(".rep-msg", box).value.trim(), rfb = $(".rep-fb", box);
+        if (msg.length < 3) { rfb.className = "fb bad rep-fb"; rfb.textContent = "Add a few words about the problem."; return; }
+        b.disabled = true;
+        sendReport({kind: $("select", box).value, message: msg, problem_key: p.key, page: "app.html#problem " + p.key}).then(function (sent) {
+          b.disabled = false; $(".rep-msg", box).value = "";
+          rfb.className = "fb good rep-fb"; rfb.textContent = sent ? "Thanks. We'll check it." : "Thanks. Saved, and it'll be sent automatically once reporting goes live.";
+        });
+        return;
+      }
       if (b.dataset.a === "save") {
         S.saved = S.saved || {}; var on = !S.saved[p.key];
         if (on) S.saved[p.key] = today(); else delete S.saved[p.key];
@@ -647,7 +664,11 @@
       "</dl>" +
       '<section class="sheet pad stack" aria-labelledby="bh"><div class="row between"><h2 id="bh">Badges</h2><a class="sub" href="#stats">See full stats</a></div><div class="badges">' +
         BADGES.map(function (b) { var on = b[2](t); return '<div class="badge' + (on ? " on" : "") + '"><span class="cell' + (on ? " solved" : "") + '" aria-hidden="true">' + (on ? CHECK : "") + "</span><span><b>" + b[0] + "</b><small>" + b[1] + "</small></span><span class=\"sr\">" + (on ? "Earned" : "Not yet earned") + "</span></div>"; }).join("") +
-      "</div></section>";
+      "</div></section>" +
+      '<section class="sheet pad stack" aria-labelledby="dh"><h2 id="dh">Your data</h2>' +
+        '<p class="sub">Your progress lives in this browser, and in your account too once you sign in. Download a copy anytime, move it to another browser, or start over.</p>' +
+        '<div class="row"><button class="btn" id="dExport">Download my data</button><button class="btn alt" id="dImportBtn">Import from a file</button><input type="file" id="dImport" accept="application/json,.json" hidden><button class="btn alt" id="dResetStart">Reset progress</button></div>' +
+        '<div id="dMsg" class="stack" aria-live="polite"></div></section>';
 
     var signedIn = null;
     function paint() {
@@ -674,6 +695,41 @@
       $("#pf-n").focus();
     };
     $("#pCancel").onclick = function () { $("#pEdit").hidden = true; };
+    function dmsg(html) { $("#dMsg").innerHTML = html; }
+    $("#dExport").onclick = function () {
+      var blob = new Blob([JSON.stringify({app: "Edge", format: 1, exported: new Date().toISOString(), progress: S}, null, 2)], {type: "application/json"});
+      var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "edge-progress-" + today() + ".json";
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      dmsg('<p class="fb good">Downloaded edge-progress-' + today() + ".json.</p>");
+    };
+    $("#dImportBtn").onclick = function () { $("#dImport").click(); };
+    $("#dImport").onchange = function () {
+      var f = this.files && this.files[0]; this.value = ""; if (!f) return;
+      if (f.size > 5e6) { dmsg('<p class="fb bad">That file is too large to be an Edge backup.</p>'); return; }
+      f.text().then(function (txt) {
+        var obj; try { obj = JSON.parse(txt); } catch (e) { obj = null; }
+        var data = obj && (obj.progress || obj);
+        if (!data || typeof data.solved !== "object" || typeof data.days !== "object") { dmsg('<p class="fb bad">That isn\'t an Edge progress file. Use a file made with "Download my data".</p>'); return; }
+        var ns = Object.keys(data.solved).length, nd = Object.keys(data.days).length;
+        dmsg('<div class="callout"><p>This file has <b>' + ns + "</b> solved problem" + (ns === 1 ? "" : "s") + " and <b>" + nd + "</b> practice day" + (nd === 1 ? "" : "s") + '. Merge it into your progress? Nothing you have now is lost.</p><div class="row" style="margin-top:10px"><button class="btn go" id="dMerge">Merge</button><button class="btn alt" id="dCancel">Cancel</button></div></div>');
+        $("#dCancel").onclick = function () { dmsg(""); };
+        $("#dMerge").onclick = function () {
+          var A = window.EdgeAuth, merged;
+          if (A && A.merge) merged = A.merge(S, data);
+          else { merged = JSON.parse(JSON.stringify(S)); for (var k in data.solved) merged.solved[k] = true; for (k in data.days) merged.days[k] = Math.max(merged.days[k] || 0, data.days[k]); merged.xp = Math.max(merged.xp || 0, data.xp || 0); }
+          window.EdgeState.replace(merged); toast("Progress imported.");
+        };
+      });
+    };
+    $("#dResetStart").onclick = function () {
+      dmsg('<div class="callout danger"><p>This erases your streak, solved problems, ratings, notes and history in this browser.' + (signedIn ? " Your synced copy stays in your account until you delete the account." : "") + ' Download a copy first if you might want it back.</p><label class="lab" for="dResetTxt">Type RESET to confirm</label><div class="row"><input class="field" id="dResetTxt" autocomplete="off"><button class="btn bad" id="dResetGo" disabled>Erase progress</button><button class="btn alt" id="dResetNo">Cancel</button></div></div>');
+      $("#dResetTxt").oninput = function () { $("#dResetGo").disabled = this.value.trim() !== "RESET"; };
+      $("#dResetNo").onclick = function () { dmsg(""); };
+      $("#dResetGo").onclick = function () {
+        window.EdgeState.replace({xp: 0, solved: {}, days: {}, r: {math: 1000, prob: 1000, mm: 1000, bet: 1000, desk: 1000}, best: {math: 0}, daily: {}, noticed: true, v: 3, first: today()});
+        location.hash = "#start"; toast("Progress reset. Fresh start.");
+      };
+    };
     $("#pForm").addEventListener("submit", function (e) {
       e.preventDefault(); var fb = this.querySelector(".fb"), nm = $("#pf-n").value.trim(), yr = $("#pf-y").value.trim();
       if (nm.length < 2) { fb.className = "fb bad"; fb.textContent = "Display name needs at least 2 characters."; return; }
@@ -1011,6 +1067,21 @@
     }
     intro();
   };
+
+
+  /* ---------- reports outbox: sent now when the database is connected, otherwise kept and sent later ---------- */
+  function sendReport(item) {
+    var A = window.EdgeAuth;
+    function keep() { S.outbox = (S.outbox || []).concat([item]).slice(-50); save(); return false; }
+    if (A && A.configured && A.sendFeedback) return A.sendFeedback(item).then(function () { return true; }, keep);
+    return Promise.resolve(keep());
+  }
+  function flushOutbox() {
+    var A = window.EdgeAuth; if (!A || !A.configured || !A.sendFeedback || !(S.outbox || []).length) return;
+    var queue = S.outbox.slice(); S.outbox = []; save();
+    queue.reduce(function (pr, item) { return pr.then(function () { return A.sendFeedback(item).catch(function () { S.outbox.push(item); save(); }); }); }, Promise.resolve());
+  }
+  if (document.readyState === "complete") flushOutbox(); else addEventListener("load", flushOutbox, {once: true});
 
   /* ---------- router ---------- */
   function clearApp() { clearTimers(); var app = $("#app"), fresh = app.cloneNode(false); app.parentNode.replaceChild(fresh, app); return fresh; }

@@ -96,6 +96,36 @@ language sql security definer set search_path = public stable as $$
 $$;
 grant execute on function public.league(date) to anon, authenticated;
 
+-- Problem reports and site feedback. Anyone can send; nobody can read through the API.
+-- You read them in the Supabase dashboard: Table Editor > feedback.
+create table if not exists public.feedback (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  user_id uuid default auth.uid() references auth.users (id) on delete set null,
+  kind text not null check (kind in ('wrong_answer', 'unclear', 'typo', 'bug', 'idea', 'other')),
+  problem_key text check (char_length(problem_key) <= 64),
+  message text not null check (char_length(message) between 3 and 2000),
+  contact text check (char_length(contact) <= 254),
+  page text check (char_length(page) <= 200)
+);
+alter table public.feedback enable row level security;
+drop policy if exists "anyone can send feedback" on public.feedback;
+create policy "anyone can send feedback" on public.feedback for insert to anon, authenticated
+  with check (user_id is null or user_id = auth.uid());
+
+-- Weekly-puzzle email list. Anyone can subscribe; nobody can read the list through the API.
+-- Export it from Table Editor > subscribers (filter out rows with unsubscribed_at set).
+create table if not exists public.subscribers (
+  email text primary key check (char_length(email) <= 254 and email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  created_at timestamptz not null default now(),
+  source text check (char_length(source) <= 40),
+  unsubscribed_at timestamptz
+);
+alter table public.subscribers enable row level security;
+drop policy if exists "anyone can subscribe" on public.subscribers;
+create policy "anyone can subscribe" on public.subscribers for insert to anon, authenticated
+  with check (unsubscribed_at is null);
+
 -- Let a signed-in user permanently delete their own account and data
 create or replace function public.delete_me()
 returns void language plpgsql security definer set search_path = public as $$

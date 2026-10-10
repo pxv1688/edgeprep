@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Edge Privacy Policy</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="How Edge handles your data. No ads, no trackers, no cookies.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
@@ -44,7 +46,7 @@
 <main id="main" tabindex="-1">
 <article class="doc">
   <h1>Privacy Policy</h1>
-  <p class="sub" style="margin-top:10px">Last updated: October 9, 2026</p>
+  <p class="sub" style="margin-top:10px">Last updated: October 10, 2026</p>
 
   <h2>The short version</h2>
   <p>Edge has no ads, no analytics trackers and no cookies. You can practice without an account. If you create one, we store only what's needed to run it: your email, your profile and your practice progress.</p>
@@ -61,6 +63,20 @@
     <li>whether you want to appear on the leaderboard.</li>
   </ul>
   <p>We use this only to run your account, sync your progress and show the leaderboard. We don't sell it or share it for advertising. If you opt in, your display name, XP, solved count and streak appear on the public leaderboard. Your email never does.</p>
+
+  <h2>Problem reports and feedback</h2>
+  <p>If you report a problem or send feedback, we store what you wrote, the type of report, the problem it's about, the page you sent it from and the time. If you're signed in, it's linked to your account. If you add an email for a reply, we store that too. We use reports only to fix problems and improve Edge. They aren't public.</p>
+  <p>If reporting isn't available yet when you send a report, it's kept in your browser and sent automatically later.</p>
+
+  <h2>Weekly puzzle email</h2>
+  <p>If you subscribe, we store your email address, when you subscribed and where you signed up. We use it only to send the weekly puzzle, never for anything else, and we never sell or share it. Every email includes a way to unsubscribe, or you can contact us to be removed.</p>
+
+  <h2 id="your-data">Downloading and deleting your data</h2>
+  <ul>
+    <li><b>Download:</b> Profile → Your data → Download my data saves everything Edge stores about your practice as a file.</li>
+    <li><b>Move:</b> Import from a file merges a download into another browser.</li>
+    <li><b>Delete:</b> Reset progress erases it from this browser. Delete account (on the Account page) removes your account and synced progress permanently.</li>
+  </ul>
 
   <h2 id="storage">Cookies and local storage</h2>
   <p>Edge sets no cookies. It uses local storage for your progress, your theme choice and, if you sign in, your login session. This storage is strictly necessary for features you ask for, so it doesn't require consent. We still tell you about it.</p>
@@ -100,7 +116,7 @@
   <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
 </footer>
 <script src="assets/config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
 <script src="assets/auth.js"></script>
 <script src="assets/site.js"></script>
 </body>

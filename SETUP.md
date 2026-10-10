@@ -34,6 +34,20 @@ In **Authentication > URL Configuration**:
 - Supabase's built-in email sender is rate-limited and meant for testing. For real users, set up custom SMTP under **Authentication > Emails** (for example with Resend or Postmark).
 - Have someone you trust read the Privacy Policy and Terms. They're solid templates, not legal advice.
 
+## Where your data shows up
+In the Supabase dashboard, open **Table Editor**:
+- **feedback:** problem reports ("The answer is wrong", "Unclear", "Typo") with the problem key, plus messages from the About page form. Sort by `created_at` to see the newest.
+- **subscribers:** the weekly-puzzle email list. Export it as CSV from the table's menu.
+- **profiles / progress:** each account's profile and synced practice.
+
+Reports people sent before you connected Supabase were saved in their browsers. They arrive automatically the next time those people open the site.
+
+## Sending the weekly puzzle email
+Edge collects subscribers but doesn't send email by itself. Pick a newsletter service (Buttondown, Beehiiv and Mailchimp all have free tiers), import the CSV from **subscribers**, and post one puzzle a week. Remove anyone who unsubscribes there from the table too (set `unsubscribed_at`).
+
+## Backups
+Supabase's free plan doesn't include automatic backups you can restore. Once a week, export **profiles**, **progress**, **feedback** and **subscribers** as CSV from the Table Editor, or upgrade to a paid plan for daily backups.
+
 ## Known limits
 - Scores are calculated in the browser, so a determined user could fake their leaderboard XP. That's fine for a practice site. Server-side scoring is the fix if it ever matters.
 - Progress syncs about 1.5 seconds after each change. If two devices are used at the same time, solved problems and streak days are combined, and ratings follow whichever device has more XP.
