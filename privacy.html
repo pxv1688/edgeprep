@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Privacy Policy</title>
+<meta name="description" content="How Edge handles your data. No ads, no trackers, no cookies.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Edge Privacy Policy">
+<meta property="og:description" content="How Edge handles your data. No ads, no trackers, no cookies.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<article class="doc">
+  <h1>Privacy Policy</h1>
+  <p class="sub" style="margin-top:10px">Last updated: October 9, 2026</p>
+
+  <h2>The short version</h2>
+  <p>Edge has no ads, no analytics trackers and no cookies. You can practice without an account. If you create one, we store only what's needed to run it: your email, your profile and your practice progress.</p>
+
+  <h2>Without an account</h2>
+  <p>Edge saves your progress in your browser's local storage under the key <code>edge-v2</code>. That includes solved problems, daily results, the days you practiced, ratings, XP and best scores. It stays on your device and isn't sent to us.</p>
+
+  <h2>With an account</h2>
+  <p>Accounts are run on Supabase, which hosts our login system and database. When you sign up we store:</p>
+  <ul>
+    <li>your email address and a securely hashed password, handled by Supabase Auth;</li>
+    <li>your display name, plus the school, graduation year and target role if you choose to add them;</li>
+    <li>a copy of your practice progress, so it syncs across devices;</li>
+    <li>whether you want to appear on the leaderboard.</li>
+  </ul>
+  <p>We use this only to run your account, sync your progress and show the leaderboard. We don't sell it or share it for advertising. If you opt in, your display name, XP, solved count and streak appear on the public leaderboard. Your email never does.</p>
+
+  <h2 id="storage">Cookies and local storage</h2>
+  <p>Edge sets no cookies. It uses local storage for your progress, your theme choice and, if you sign in, your login session. This storage is strictly necessary for features you ask for, so it doesn't require consent. We still tell you about it.</p>
+  <p>To remove it, clear this site's data in your browser settings.</p>
+
+  <h2>Service providers</h2>
+  <ul>
+    <li><b>Supabase</b> stores account data. See <a href="https://supabase.com/privacy" rel="noopener">Supabase's privacy policy</a>.</li>
+    <li><b>Google Fonts</b> serves our typeface. Your browser's request reveals your IP address to Google, as described in <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy</a>.</li>
+    <li><b>jsDelivr</b> serves the Supabase code library.</li>
+    <li>Our <b>hosting provider</b> may keep standard server logs, such as IP addresses and request times.</li>
+  </ul>
+
+  <h2>Your choices</h2>
+  <ul>
+    <li>Edit your profile or leave the leaderboard at any time on the Account page.</li>
+    <li>Delete your account from the Account page. This permanently removes your profile and synced progress.</li>
+    <li>Contact us to ask what we hold about you.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>Edge is for people aged 13 and older. Don't create an account if you're under 13. If we learn that a child under 13 has an account, we'll delete it.</p>
+
+  <h2>Changes</h2>
+  <p>If we change how we handle data, we'll update this page and the date above before the change takes effect.</p>
+
+  <h2>Contact</h2>
+  <p>Privacy questions: <span class="todo">[add your contact email]</span></p>
+</article>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

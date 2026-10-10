@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Quant Interview Prep</title>
+<meta name="description" content="Daily quant interview practice as games: 3,000+ problems in probability, brainteasers, options, statistics, code and mental math. Free.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Edge: quant interviews, one square a day">
+<meta property="og:description" content="Daily quant interview practice as games: 3,000+ problems in probability, brainteasers, options, statistics, code and mental math. Free.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body class="landing">
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#games">Games</a>
+      <a href="#topics">Topics</a>
+      <a href="about.html">FAQ</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+
+<main id="main" tabindex="-1" class="lp">
+  <section class="hero" aria-labelledby="hh">
+    <div class="hero-copy stack">
+      <h1 id="hh">Quant interviews, one square a day.</h1>
+      <p class="lede">Edge turns interview prep into a daily puzzle habit. Work through <b class="num" data-count="all">thousands of</b> problems in probability, brainteasers, options, statistics, code and mental math, then sharpen up in timed games built like trading-firm tests.</p>
+      <div class="row">
+        <a class="btn go big-btn" id="ctaMain" href="login.html#signup">Create free account</a>
+        <a class="btn alt big-btn" id="ctaGuest" href="app.html#today">Practice as a guest</a>
+      </div>
+      <p class="sub">Free. No ads. Every answer comes with a worked explanation.</p>
+    </div>
+    <div class="sheet pad stack try" aria-labelledby="tryh">
+      <div class="row between"><h2 id="tryh">Try one now</h2><span class="sub" id="tryMeta"></span></div>
+      <p class="today-q" id="tryQ"></p>
+      <div class="row"><label for="tryA" class="sr">Your answer</label><input class="field" id="tryA" autocomplete="off" inputmode="decimal" placeholder="e.g. 3/8 or 0.375"><button class="btn go" id="tryGo">Check</button></div>
+      <p class="fb" id="tryFb" aria-live="polite"></p>
+      <div class="ex" id="tryEx" hidden></div>
+      <div class="row between try-foot"><div class="mini-row" aria-hidden="true" id="tryRow"></div><button class="btn alt" id="tryNext">Another problem</button></div>
+    </div>
+  </section>
+
+  <dl class="stats lp-stats" aria-label="What's inside">
+    <div><dt>Problems</dt><dd class="num" data-count="all">3,000+</dd></div>
+    <div><dt>Topics</dt><dd class="num">6</dd></div>
+    <div><dt>Timed games</dt><dd class="num">4</dd></div>
+    <div><dt>New daily puzzle</dt><dd class="num">Every day</dd></div>
+  </dl>
+
+  <section id="how" class="stack" aria-labelledby="howh">
+    <h2 id="howh" class="lp-h">How it works</h2>
+    <ol class="steps">
+      <li class="sheet pad stack">
+        <span class="n">1</span>
+        <h3>Solve today's puzzle</h3>
+        <p>One new problem every day. Solve it and that day's square on your calendar turns yellow. Keep the streak alive.</p>
+        <div class="month mini" aria-hidden="true"><div class="cell solved"><sup>1</sup></div><div class="cell solved"><sup>2</sup></div><div class="cell black"><sup>3</sup></div><div class="cell solved"><sup>4</sup></div><div class="cell solved"><sup>5</sup></div><div class="cell solved"><sup>6</sup></div><div class="cell today"><sup>7</sup></div></div>
+      </li>
+      <li class="sheet pad stack">
+        <span class="n">2</span>
+        <h3>Drill the bank</h3>
+        <p>Search by topic or difficulty, or hit Random unsolved. Every problem has a hint and a worked explanation.</p>
+        <div class="bank mini-bank" aria-hidden="true" id="miniBank"></div>
+      </li>
+      <li class="sheet pad stack">
+        <span class="n">3</span>
+        <h3>Watch your ratings climb</h3>
+        <p>Each skill has a rating that moves with every answer. Your stats page shows accuracy, streaks and weak spots.</p>
+        <div class="stack" aria-hidden="true" style="gap:8px">
+          <div class="clue-r" style="max-width:none"><div class="track"><i style="width:52%"></i></div><b>1440</b></div>
+          <div class="clue-r" style="max-width:none"><div class="track"><i style="width:38%"></i></div><b>1160</b></div>
+          <div class="clue-r" style="max-width:none"><div class="track"><i style="width:44%"></i></div><b>1280</b></div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="games" class="stack" aria-labelledby="gh">
+    <div class="row between"><h2 id="gh" class="lp-h">Four games, four interview rounds</h2><a class="sub" href="app.html#games">Play now</a></div>
+    <div class="clues two">
+      <a class="clue" href="app.html#math"><span class="n">1</span><span class="clue-b"><h3>Speed Math</h3><p>Two minutes of arithmetic against the clock, like the mental math tests trading firms give.</p></span><span class="go">Play</span></a>
+      <a class="clue" href="app.html#market"><span class="n">2</span><span class="clue-b"><h3>Make a Market</h3><p>Quote a bid and an ask on a number you don't know. Too wide costs you; too tight gets you picked off.</p></span><span class="go">Play</span></a>
+      <a class="clue" href="app.html#bet"><span class="n">3</span><span class="clue-b"><h3>Betting Table</h3><p>A coin with an edge and a bankroll. Learn Kelly sizing by watching what over-betting does.</p></span><span class="go">Play</span></a>
+      <a class="clue" href="app.html#quiz"><span class="n">4</span><span class="clue-b"><h3>Desk Quiz</h3><p>Rapid questions on Greeks, put–call parity, regression and Python gotchas.</p></span><span class="go">Play</span></a>
+    </div>
+  </section>
+
+  <section id="topics" class="stack" aria-labelledby="th">
+    <h2 id="th" class="lp-h">Every topic interviews test</h2>
+    <div class="topics" id="topicGrid"></div>
+  </section>
+
+  <section class="cta-band" aria-labelledby="ch">
+    <div class="stack">
+      <h2 id="ch">Your first square is waiting.</h2>
+      <p>Create a free account to sync your streak across devices and join the leaderboard, or jump straight in as a guest.</p>
+    </div>
+    <div class="row"><a class="btn go big-btn" href="login.html#signup" id="ctaEnd">Create free account</a><a class="btn alt on-cobalt big-btn" href="app.html#today">Practice as a guest</a></div>
+  </section>
+</main>
+
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/generators.js"></script>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  "use strict";
+  var CL = window.EDGE_BANK, ALL = CL.concat(window.EDGE_GENERATED || []), SETS = window.EDGE_SETS;
+  var $ = function (s) { return document.querySelector(s); };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); }
+  var total = ALL.length.toLocaleString();
+  document.querySelectorAll('[data-count="all"]').forEach(function (el) { el.textContent = total; });
+
+  /* signed-in visitors go straight to the app; returning guests get "continue" */
+  var A = window.EdgeAuth;
+  if (A) A.onChange(function (u) { if (u) location.replace("app.html#today"); });
+  try { var st = JSON.parse(localStorage.getItem("edge-v2") || "null"); if (st && st.solved && Object.keys(st.solved).length) { $("#ctaGuest").textContent = "Continue practicing"; } } catch (e) {}
+  if (A && !A.configured) { ["#ctaMain", "#ctaEnd"].forEach(function (s) { var b = $(s); b.textContent = "Start practicing"; b.href = "app.html#today"; }); $("#ctaGuest").hidden = true; }
+
+  /* try-one-now: warm-up probability and brainteasers */
+  var pool = CL.filter(function (p) { return p.type === "num" && p.diff <= 2 && (p.set === "prob" || p.set === "brain"); });
+  var i = Math.floor(Math.random() * pool.length), solved = 0, cur;
+  function parse(s) { s = String(s).trim().replace(/,/g, "").replace(/\s+/g, ""); if (!s) return NaN; var m = s.match(/^(-?[\d.]+)\/([\d.]+)$/); if (m) return +m[1] / +m[2]; if (/%$/.test(s)) return parseFloat(s) / 100; return Number(s); }
+  function close(v, a) { return Math.abs(v - a) <= Math.max(0.0005, Math.abs(a) * 0.01); }
+  function fmt(x) { if (Number.isInteger(x)) return x.toLocaleString(); for (var d = 2; d <= 2600; d++) { var n = Math.round(x * d); if (Math.abs(n / d - x) < 1e-9) return n + "/" + d; } return String(+x.toPrecision(4)); }
+  function row() { var h = ""; for (var k = 0; k < 5; k++) h += '<span class="cell' + (k < solved ? " solved" : "") + '"><sup>' + (k + 1) + "</sup></span>"; $("#tryRow").innerHTML = h; }
+  function load() {
+    cur = pool[i % pool.length]; i++;
+    $("#tryQ").textContent = cur.q; $("#tryMeta").textContent = (cur.set === "prob" ? "Probability" : "Brainteaser");
+    $("#tryA").value = ""; $("#tryA").disabled = false; $("#tryGo").disabled = false; $("#tryFb").textContent = ""; $("#tryEx").hidden = true;
+  }
+  function reveal(ok) {
+    $("#tryEx").hidden = false; $("#tryEx").innerHTML = "<b>Answer: " + esc(fmt(cur.a)) + "</b><p>" + esc(cur.ex) + "</p>";
+    $("#tryA").disabled = true; $("#tryGo").disabled = true;
+    if (ok) { solved = Math.min(5, solved + 1); row(); var c = document.querySelectorAll("#tryRow .cell")[solved - 1]; if (c) c.classList.add("stamp"); }
+  }
+  var tries = 0;
+  $("#tryGo").onclick = function () {
+    var v = parse($("#tryA").value), fb = $("#tryFb");
+    if (isNaN(v)) { fb.className = "fb bad"; fb.textContent = "Enter a number, a fraction like 3/8, or a percent."; return; }
+    tries++;
+    if (close(v, cur.a)) { fb.className = "fb good"; fb.textContent = "Correct. That's one square filled."; reveal(true); tries = 0; }
+    else if (tries >= 2) { fb.className = "fb bad"; fb.textContent = "Not quite. Here's how it works:"; reveal(false); tries = 0; }
+    else { fb.className = "fb bad"; fb.textContent = "Not quite. Hint: " + cur.hint; }
+  };
+  $("#tryA").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#tryGo").click(); });
+  $("#tryNext").onclick = function () { tries = 0; load(); $("#tryA").focus(); };
+  row(); load();
+
+  /* mini bank illustration: 40 squares, a few solved */
+  var mb = ""; for (var k = 1; k <= 40; k++) mb += '<span class="cell' + ([2, 3, 7, 11, 12, 13, 18, 22, 29, 31].indexOf(k) >= 0 ? " solved" : "") + '"><sup>' + k + "</sup></span>"; $("#miniBank").innerHTML = mb;
+
+  /* topic tiles with real counts and a sample question */
+  $("#topicGrid").innerHTML = SETS.map(function (s, n) {
+    var items = ALL.filter(function (p) { return p.set === s.id; }), sample = items[Math.floor(items.length / 3)] || items[0];
+    return '<a class="topic" href="app.html#bank"><span class="topic-n">' + (n + 1) + '</span><h3>' + s.name + '</h3><b class="num">' + items.length.toLocaleString() + ' problems</b><p>' + esc(s.blurb) + '</p><q>' + esc(sample.q.length > 120 ? sample.q.slice(0, 117) + "…" : sample.q) + "</q></a>";
+  }).join("");
+})();
+</script>
+</body>
+</html>

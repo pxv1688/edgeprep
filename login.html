@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in to Edge</title>
+<meta name="description" content="Sign in or create a free Edge account to sync your quant interview practice.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Sign in to Edge">
+<meta property="og:description" content="Sign in or create a free Edge account to sync your quant interview practice.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<div class="split">
+  <section class="sheet pad stack" aria-labelledby="h">
+    <h1 id="h">Your account</h1>
+    <p class="lede">Sign in to sync your streak, solved problems and ratings across devices, and to appear on the leaderboard.</p>
+    <div id="off" class="callout" hidden>Accounts are coming soon. You can practice right now without one; your progress is saved in this browser.</div>
+    <div id="on">
+      <div class="tabs" role="tablist" aria-label="Account options">
+        <button role="tab" id="t-in" aria-selected="true" aria-controls="p-in">Sign in</button>
+        <button role="tab" id="t-up" aria-selected="false" aria-controls="p-up">Create account</button>
+        <button role="tab" id="t-re" aria-selected="false" aria-controls="p-re">Forgot password</button>
+      </div>
+      <form class="form" id="p-in" role="tabpanel" aria-labelledby="t-in" style="margin-top:18px" novalidate>
+        <div class="fieldset"><label class="lab" for="in-email">Email</label><input class="field" id="in-email" type="email" autocomplete="email" required></div>
+        <div class="fieldset"><label class="lab" for="in-pw">Password</label><input class="field" id="in-pw" type="password" autocomplete="current-password" required></div>
+        <button class="btn go" type="submit">Sign in</button>
+        <p class="fb" aria-live="polite"></p>
+      </form>
+      <form class="form" id="p-up" role="tabpanel" aria-labelledby="t-up" style="margin-top:18px" hidden novalidate>
+        <div class="fieldset"><label class="lab" for="up-name">Display name (shown on the leaderboard)</label><input class="field" id="up-name" maxlength="24" autocomplete="nickname" required></div>
+        <div class="fieldset"><label class="lab" for="up-email">Email</label><input class="field" id="up-email" type="email" autocomplete="email" required></div>
+        <div class="fieldset"><label class="lab" for="up-pw">Password (at least 8 characters)</label><input class="field" id="up-pw" type="password" autocomplete="new-password" minlength="8" required></div>
+        <label class="check"><input type="checkbox" id="up-ok"> <span>I'm 13 or older and I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</span></label>
+        <button class="btn go" type="submit">Create account</button>
+        <p class="fb" aria-live="polite"></p>
+      </form>
+      <form class="form" id="p-re" role="tabpanel" aria-labelledby="t-re" style="margin-top:18px" hidden novalidate>
+        <p class="sub">Enter your email and we'll send a link to set a new password.</p>
+        <div class="fieldset"><label class="lab" for="re-email">Email</label><input class="field" id="re-email" type="email" autocomplete="email" required></div>
+        <button class="btn go" type="submit">Send reset link</button>
+        <p class="fb" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+  <aside class="sheet pad stack" aria-label="What an account adds">
+    <h2>What you get</h2>
+    <div class="clues" style="border-top:2px solid var(--rule)">
+      <div class="clue" style="grid-template-columns:56px minmax(0,1fr)"><span class="n">1</span><span><h3>Sync</h3><p>Your streak and every solved square, on every device.</p></span></div>
+      <div class="clue" style="grid-template-columns:56px minmax(0,1fr)"><span class="n">2</span><span><h3>Leaderboard</h3><p>See where you rank. You can opt out anytime.</p></span></div>
+      <div class="clue" style="grid-template-columns:56px minmax(0,1fr)"><span class="n">3</span><span><h3>Profile</h3><p>Track your school, grad year and target role.</p></span></div>
+    </div>
+    <p class="sub">Free. No ads. Your progress from before you sign up is kept and merged in.</p>
+  </aside>
+</div>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var A = window.EdgeAuth;
+  if (!A.configured) { document.getElementById("off").hidden = false; document.getElementById("on").hidden = true; return; }
+  var tabs = ["in", "up", "re"];
+  function show(id) { tabs.forEach(function (t) { document.getElementById("t-" + t).setAttribute("aria-selected", t === id); document.getElementById("p-" + t).hidden = t !== id; }); }
+  tabs.forEach(function (t) { document.getElementById("t-" + t).onclick = function () { show(t); }; });
+  if (location.hash === "#signup") show("up");
+  A.onChange(function (u) { if (u && A.lastEvent === "SIGNED_IN") location.href = "app.html#today"; });
+  function say(form, msg, good) { var fb = form.querySelector(".fb"); fb.className = "fb " + (good ? "good" : "bad"); fb.textContent = msg; }
+  function busy(form, on) { form.querySelector("button[type=submit]").disabled = on; }
+  function valid(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+  document.getElementById("p-in").addEventListener("submit", function (e) {
+    e.preventDefault(); var f = this, em = f.querySelector("#in-email").value.trim(), pw = f.querySelector("#in-pw").value;
+    if (!valid(em) || !pw) return say(f, "Enter your email and password.");
+    busy(f, true); say(f, "Signing in…", true);
+    A.signIn(em, pw).then(function () { location.href = "app.html#today"; }, function (err) { busy(f, false); say(f, /confirm/i.test(err.message) ? "Confirm your email first. Check your inbox for the link." : "That email and password don't match. Try again or reset your password."); });
+  });
+  document.getElementById("p-up").addEventListener("submit", function (e) {
+    e.preventDefault(); var f = this, nm = f.querySelector("#up-name").value.trim(), em = f.querySelector("#up-email").value.trim(), pw = f.querySelector("#up-pw").value;
+    if (nm.length < 2) return say(f, "Pick a display name with at least 2 characters.");
+    if (!valid(em)) return say(f, "Enter a valid email address.");
+    if (pw.length < 8) return say(f, "Use a password with at least 8 characters.");
+    if (!f.querySelector("#up-ok").checked) return say(f, "Please confirm you're 13 or older and agree to the Terms.");
+    busy(f, true); say(f, "Creating your account…", true);
+    A.signUp(em, pw, nm).then(function (d) {
+      if (d && d.session) location.href = "app.html#today";
+      else { say(f, "Almost done. We sent a confirmation link to " + em + ". Open it to finish signing up.", true); }
+    }, function (err) { busy(f, false); say(f, /registered|exists/i.test(err.message) ? "That email already has an account. Sign in instead." : "Couldn't create the account: " + err.message); });
+  });
+  document.getElementById("p-re").addEventListener("submit", function (e) {
+    e.preventDefault(); var f = this, em = f.querySelector("#re-email").value.trim();
+    if (!valid(em)) return say(f, "Enter a valid email address.");
+    busy(f, true);
+    A.sendReset(em).then(function () { say(f, "If an account exists for " + em + ", a reset link is on its way.", true); }, function () { busy(f, false); say(f, "Couldn't send the link right now. Try again in a minute."); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Practice</title>
+<meta name="description" content="Daily quant interview practice as games: 3,000+ problems in probability, brainteasers, options, statistics, code and mental math. Free.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Edge practice">
+<meta property="og:description" content="Daily quant interview practice as games: 3,000+ problems in probability, brainteasers, options, statistics, code and mental math. Free.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body>
+<a class="skip" href="#app">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#today">Today</a>
+      <a href="#train">Train</a>
+      <a href="#bank">Problem Bank</a>
+      <a href="#games">Games</a>
+      <a href="#stats">Stats</a>
+      <a href="#profile">Profile</a>
+    </nav>
+    <div class="streak" title="Days in a row with at least one solve">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-3 2-4 2-7 2 1 3 3 3 5 1-1 1-3 0-9Z" fill="var(--yellow)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <b id="streak" class="num">0</b><span>day streak</span>
+    </div>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+
+<div class="notice" id="notice" hidden role="region" aria-label="Storage notice">
+  <p><strong style="color:var(--ink)">No cookies, no ad tracking.</strong> Edge saves your progress in this browser. If you create an account, it also syncs to your account. <a href="privacy.html#storage">How storage works</a></p>
+  <div class="row"><button class="btn" id="noticeOk">Got it</button></div>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/generators.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

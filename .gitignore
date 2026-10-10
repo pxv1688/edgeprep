@@ -1,0 +1,4 @@
+.claude/
+.impeccable/
+*.bak
+__pycache__/

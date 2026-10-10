@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Leaderboard</title>
+<meta name="description" content="Weekly leagues and all-time rankings for Edge quant interview practice.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Edge Leaderboard">
+<meta property="og:description" content="Weekly leagues and all-time rankings for Edge quant interview practice.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<div class="stack"><h1>Leaderboard</h1><p class="lede">Weekly leagues reset every Monday at 00:00 UTC, so everyone starts level each week. Earn XP by solving problems and playing games. Finish in the top 10 to earn the League badge.</p></div>
+<div class="tabs" role="tablist" aria-label="Leaderboard period">
+  <button role="tab" id="t-week" aria-selected="true">This week</button>
+  <button role="tab" id="t-last" aria-selected="false">Last week</button>
+  <button role="tab" id="t-all" aria-selected="false">All time</button>
+</div>
+<dl class="stats" style="margin:0">
+  <div><dt>Your XP this week</dt><dd class="num" id="myWk">0</dd></div>
+  <div><dt>Resets in</dt><dd class="num" id="reset">–</dd></div>
+  <div><dt>Your rank</dt><dd class="num" id="myRank">–</dd></div>
+</dl>
+<section class="sheet pad stack" aria-label="Rankings">
+  <div class="podium" id="podium" hidden></div>
+  <div id="lbMsg" class="callout">Loading rankings…</div>
+  <div class="scroll-x"><table class="tbl" id="lb" hidden><thead><tr id="lbHead"></tr></thead><tbody></tbody></table></div>
+  <p class="sub" id="lbCta"></p>
+</section>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var A = window.EdgeAuth, $ = function (s) { return document.querySelector(s); };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]; }); }
+  function weekStart(offset) { var d = new Date(), day = (d.getUTCDay() + 6) % 7; return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - day - 7 * (offset || 0))).toISOString().slice(0, 10); }
+  var S = {}; try { S = JSON.parse(localStorage.getItem("edge-v2") || "{}"); } catch (e) {}
+  $("#myWk").textContent = (S.wk && S.wk.start === weekStart(0) ? S.wk.xp : 0).toLocaleString();
+  function tick() {
+    var ms = Date.parse(weekStart(0) + "T00:00:00Z") + 7 * 864e5 - Date.now(), d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+    $("#reset").textContent = d + "d " + h + "h " + m + "m";
+  }
+  tick(); setInterval(tick, 30000);
+  var msg = $("#lbMsg"), tbl = $("#lb"), mode = "week";
+  if (!A.configured) {
+    msg.textContent = "Leagues open when accounts launch. Your weekly XP is already being counted in this browser, so you'll be ready.";
+    ["#t-week", "#t-last", "#t-all"].forEach(function (s) { $(s).disabled = true; });
+    return;
+  }
+  A.onChange(function (u) { $("#lbCta").innerHTML = u ? 'Not listed? Turn on "Show my display name" on your <a href="account.html">account page</a>.' : '<a href="login.html#signup">Create a free account</a> to join this week\'s league.'; });
+  function markTop10(rows) {
+    var me = rows.filter(function (r) { return r.is_me; })[0];
+    if (me && me.rank <= 10 && !S.leagueTop10) { S.leagueTop10 = true; try { localStorage.setItem("edge-v2", JSON.stringify(S)); } catch (e) {} }
+  }
+  function render(rows, weekly) {
+    $("#podium").hidden = true; tbl.hidden = true; msg.hidden = false;
+    if (!rows || !rows.length) { msg.textContent = weekly ? "No one has scored yet this period. Solve a problem and take first place." : "No one is ranked yet."; $("#myRank").textContent = "–"; return; }
+    msg.hidden = true; tbl.hidden = false;
+    var me = rows.filter(function (r) { return r.is_me; })[0];
+    $("#myRank").textContent = me ? "#" + me.rank : "–";
+    if (weekly && rows.length >= 3) {
+      $("#podium").hidden = false;
+      $("#podium").innerHTML = rows.slice(0, 3).map(function (r, i) { return "<div><b>" + (i + 1) + "</b><span>" + esc(r.display_name) + "</span><small>" + Number(r.week_xp).toLocaleString() + " XP</small></div>"; }).join("");
+    }
+    $("#lbHead").innerHTML = weekly ? '<th scope="col">Rank</th><th scope="col">Player</th><th scope="col" class="r">XP</th>' : '<th scope="col">Rank</th><th scope="col">Player</th><th scope="col" class="r">Solved</th><th scope="col" class="r">Streak</th><th scope="col" class="r">XP</th>';
+    tbl.querySelector("tbody").innerHTML = rows.map(function (r, i) {
+      var cls = r.is_me ? ' class="me"' : "";
+      return weekly
+        ? "<tr" + cls + '><td class="rk">' + r.rank + "</td><td>" + esc(r.display_name) + (r.rank <= 10 ? ' <small class="sub">top 10</small>' : "") + '</td><td class="r"><b>' + Number(r.week_xp).toLocaleString() + "</b></td></tr>"
+        : "<tr" + cls + '><td class="rk">' + (i + 1) + "</td><td>" + esc(r.display_name) + '</td><td class="r">' + Number(r.solved_count).toLocaleString() + '</td><td class="r">' + r.streak + '</td><td class="r"><b>' + Number(r.xp).toLocaleString() + "</b></td></tr>";
+    }).join("");
+  }
+  function load() {
+    msg.hidden = false; msg.textContent = "Loading rankings…"; tbl.hidden = true; $("#podium").hidden = true;
+    var p = mode === "all" ? A.leaderboard() : A.league(weekStart(mode === "last" ? 1 : 0));
+    p.then(function (rows) { if (mode === "last") markTop10(rows || []); render(rows, mode !== "all"); }, function () { msg.textContent = "Couldn't load the leaderboard right now. Refresh to try again."; });
+  }
+  [["week", "#t-week"], ["last", "#t-last"], ["all", "#t-all"]].forEach(function (t) {
+    $(t[1]).onclick = function () { mode = t[0]; ["#t-week", "#t-last", "#t-all"].forEach(function (s) { $(s).setAttribute("aria-selected", s === t[1]); }); load(); };
+  });
+  A.league(weekStart(1)).then(markTop10, function () {});
+  load();
+})();
+</script>
+</body>
+</html>

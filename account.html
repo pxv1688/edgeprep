@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Account</title>
+<meta name="description" content="Manage your Edge account.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Edge Account">
+<meta property="og:description" content="Manage your Edge account.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<div class="stack"><h1 id="h">Account</h1><p class="lede" id="who">Loading your account…</p></div>
+<div id="off" class="callout" hidden>Accounts are coming soon. Your progress is saved in this browser in the meantime. <a href="app.html#today">Back to practice</a></div>
+<div id="out" class="callout" hidden>You're not signed in. <a href="login.html">Sign in</a> or <a href="login.html#signup">create a free account</a>.</div>
+<div id="in" class="stack" hidden>
+  <dl class="stats" id="stats" style="margin:0"></dl>
+  <div class="split">
+    <section class="sheet pad stack" aria-labelledby="hp">
+      <h2 id="hp">Profile</h2>
+      <form class="form" id="prof" novalidate>
+        <div class="fieldset"><label class="lab" for="pf-name">Display name</label><input class="field" id="pf-name" maxlength="24" required></div>
+        <div class="fieldset"><label class="lab" for="pf-school">School (optional)</label><input class="field" id="pf-school" maxlength="80" autocomplete="organization"></div>
+        <div class="fieldset"><label class="lab" for="pf-year">Graduation year (optional)</label><input class="field" id="pf-year" inputmode="numeric" maxlength="4" placeholder="2028"></div>
+        <div class="fieldset"><label class="lab" for="pf-role">Target role</label><select id="pf-role"><option value="undecided">Undecided</option><option value="trader">Quant trader</option><option value="researcher">Quant researcher</option><option value="developer">Quant developer</option></select></div>
+        <label class="check"><input type="checkbox" id="pf-lb"> <span>Show my display name and scores on the public leaderboard.</span></label>
+        <button class="btn go" type="submit">Save profile</button>
+        <p class="fb" aria-live="polite"></p>
+      </form>
+    </section>
+    <div class="stack">
+      <section class="sheet pad stack" aria-labelledby="hs">
+        <h2 id="hs">Password</h2>
+        <form class="form" id="pw" novalidate>
+          <div class="fieldset"><label class="lab" for="pw-new">New password (at least 8 characters)</label><input class="field" id="pw-new" type="password" autocomplete="new-password" minlength="8"></div>
+          <button class="btn" type="submit">Change password</button>
+          <p class="fb" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="sheet pad stack" aria-labelledby="ho">
+        <h2 id="ho">Session</h2>
+        <div class="row"><button class="btn alt" id="signout">Sign out</button></div>
+        <p class="sub">Signing out keeps a copy of your progress in this browser.</p>
+      </section>
+      <section class="sheet pad stack danger" aria-labelledby="hd">
+        <h2 id="hd">Delete account</h2>
+        <p class="sub">This permanently deletes your account, profile and synced progress. It can't be undone.</p>
+        <div class="row" id="delRow"><button class="btn alt" id="delStart">Delete my account</button></div>
+        <div class="stack" id="delConfirm" hidden>
+          <label class="lab" for="delText">Type DELETE to confirm</label>
+          <div class="row"><input class="field" id="delText" autocomplete="off"><button class="btn bad" id="delGo" disabled>Delete forever</button><button class="btn alt" id="delCancel">Cancel</button></div>
+          <p class="fb" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var A = window.EdgeAuth, $ = function (s) { return document.querySelector(s); };
+  if (!A.configured) { $("#off").hidden = false; $("#who").textContent = "Practice without an account for now."; return; }
+  function say(el, msg, good) { el.className = "fb " + (good ? "good" : "bad"); el.textContent = msg; }
+  function localStats() {
+    var S = {}; try { S = JSON.parse(localStorage.getItem("edge-v2") || "{}"); } catch (e) {}
+    var d = new Date(), n = 0, days = S.days || {};
+    function k(x) { return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0"); }
+    if (!days[k(d)]) d.setDate(d.getDate() - 1);
+    while (days[k(d)]) { n++; d.setDate(d.getDate() - 1); }
+    return [["Problems solved", Object.keys(S.solved || {}).length], ["XP", S.xp || 0], ["Day streak", n], ["Speed Math best", (S.best || {}).math || 0]];
+  }
+  var loaded = false;
+  A.onChange(function (u) {
+    $("#in").hidden = !u; $("#out").hidden = !!u;
+    if (!u) { $("#who").textContent = "Sign in to manage your account."; return; }
+    $("#who").textContent = "Signed in as " + u.email + ".";
+    $("#stats").innerHTML = localStats().map(function (s) { return "<div><dt>" + s[0] + '</dt><dd class="num">' + Number(s[1]).toLocaleString() + "</dd></div>"; }).join("");
+    if (loaded) return; loaded = true;
+    A.getProfile().then(function (p) {
+      p = p || {};
+      $("#pf-name").value = p.display_name || A.name(u);
+      $("#pf-school").value = p.school || "";
+      $("#pf-year").value = p.grad_year || "";
+      $("#pf-role").value = p.target_role || "undecided";
+      $("#pf-lb").checked = p.show_on_leaderboard !== false;
+    });
+  });
+  $("#prof").addEventListener("submit", function (e) {
+    e.preventDefault(); var fb = this.querySelector(".fb"), nm = $("#pf-name").value.trim(), yr = $("#pf-year").value.trim();
+    if (nm.length < 2) return say(fb, "Display name needs at least 2 characters.");
+    if (yr && !/^20[2-4]\d$/.test(yr)) return say(fb, "Enter a graduation year between 2020 and 2049, or leave it blank.");
+    A.saveProfile({display_name: nm, school: $("#pf-school").value.trim() || null, grad_year: yr ? +yr : null, target_role: $("#pf-role").value, show_on_leaderboard: $("#pf-lb").checked})
+      .then(function () { say(fb, "Profile saved.", true); }, function (err) { say(fb, "Couldn't save: " + err.message); });
+  });
+  $("#pw").addEventListener("submit", function (e) {
+    e.preventDefault(); var fb = this.querySelector(".fb"), pw = $("#pw-new").value;
+    if (pw.length < 8) return say(fb, "Use at least 8 characters.");
+    A.updatePassword(pw).then(function () { $("#pw-new").value = ""; say(fb, "Password changed.", true); }, function (err) { say(fb, "Couldn't change it: " + err.message); });
+  });
+  $("#signout").onclick = function () { A.signOut().then(function () { location.href = "index.html"; }); };
+  $("#delStart").onclick = function () { $("#delRow").hidden = true; $("#delConfirm").hidden = false; $("#delText").focus(); };
+  $("#delCancel").onclick = function () { $("#delRow").hidden = false; $("#delConfirm").hidden = true; $("#delText").value = ""; $("#delGo").disabled = true; };
+  $("#delText").oninput = function () { $("#delGo").disabled = this.value.trim() !== "DELETE"; };
+  $("#delGo").onclick = function () {
+    var fb = $("#delConfirm .fb"); this.disabled = true; say(fb, "Deleting…", true);
+    A.deleteAccount().then(function () { location.href = "index.html"; }, function (err) { say(fb, "Couldn't delete the account: " + err.message); });
+  };
+})();
+</script>
+</body>
+</html>

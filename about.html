@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About Edge</title>
+<meta name="description" content="How Edge works, where the problems come from, and answers to common questions.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="About Edge">
+<meta property="og:description" content="How Edge works, where the problems come from, and answers to common questions.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<article class="doc">
+  <h1>About Edge</h1>
+  <p class="lede" style="margin-top:12px">Edge is a free daily trainer for quant trading, research and developer interviews. Every topic is a game, every answer comes with the method, and a daily puzzle keeps the habit going.</p>
+
+  <h2>How it works</h2>
+  <ul>
+    <li><b>Today:</b> one new puzzle a day. Solve it to fill in your calendar square and keep your streak.</li>
+    <li><b>Problem Bank:</b> thousands of problems across probability, brainteasers, options, statistics, code and mental math, each with a hint and a full explanation.</li>
+    <li><b>Games:</b> Speed Math, Make a Market, the Betting Table and the Desk Quiz drill the skills interviews test under time pressure.</li>
+    <li><b>Ratings:</b> each skill starts at 1000 and moves with your answers, so you can see where to focus.</li>
+  </ul>
+
+  <h2>Where the problems come from</h2>
+  <p>Every problem is written for Edge. Some are hand-written classics in our own words. Most come from problem generators: each covers a well-known problem type, such as gambler's ruin, Bayes tests or Black–Scholes pricing, with many sets of numbers. Edge computes every answer, so the answer key is exact. None are actual questions from any firm.</p>
+
+  <h2>FAQ</h2>
+  <details class="faq"><summary>Is Edge free?</summary><p>Yes. Everything on the site is free, with no ads.</p></details>
+  <details class="faq"><summary>Do I need an account?</summary><p>No. You can practice without one, and your progress is saved in your browser. An account syncs your progress across devices and puts you on the leaderboard.</p></details>
+  <details class="faq"><summary>How are answers checked?</summary><p>Type a number, a fraction like 3/8, or a percent. Probability answers within 1% count. Counting and integer answers must be exact. Option-pricing estimates allow a little more room, as noted in the hint.</p></details>
+  <details class="faq"><summary>What if I find a wrong answer?</summary><p>Please tell us using the contact below, with the problem number. We fix errors quickly.</p></details>
+  <details class="faq"><summary>Is Edge affiliated with any trading firm?</summary><p>No. Edge is independent. Firm names, where they appear, only describe common interview formats.</p></details>
+  <details class="faq"><summary>How do I delete my data?</summary><p>Signed in, go to Account and choose Delete account. Without an account, clear this site's data in your browser settings.</p></details>
+
+  <h2 id="contact">Contact</h2>
+  <p>Questions, corrections or ideas: <span class="todo">[add your contact email]</span></p>
+</article>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>
