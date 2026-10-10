@@ -294,5 +294,138 @@
     add("corr", "Correlation", "stats", 1, "Cov(X, Y) = " + t[0] + ", SD(X) = " + t[1] + ", SD(Y) = " + t[2] + ". What is Corr(X, Y)?", t[0] / (t[1] * t[2]), "ρ = Cov / (σx σy).", t[0] + " / (" + t[1] + " × " + t[2] + ") = " + r4(t[0] / (t[1] * t[2])) + ".", {abs: 0.0001});
     add("beta", "Regression", "stats", 2, "Cov(X, Y) = " + t[0] + " and SD(X) = " + t[1] + ". What is the OLS slope when regressing Y on X?", t[0] / (t[1] * t[1]), "β = Cov(X,Y) / Var(X).", t[0] + " / " + (t[1] * t[1]) + " = " + r4(t[0] / (t[1] * t[1])) + ".", {abs: 0.0001}); });
 
+  /* ================= METHOD-FIRST EXPLANATIONS =================
+     Rewrites the short "formula = answer" explanations so each one teaches how to get there.
+     Numbers are read back from the question text; if a pattern ever fails to match, the original explanation stays. */
+  function nums(s) { return (s.match(/-?\d+(?:\.\d+)?/g) || []).map(Number); }
+  function fx(x) { return String(+(+x).toFixed(6)); }
+  var EXPLAIN = {
+    mul2: function (q) { var m = q.match(/What is (\d+) × (\d+)\?/); if (!m) return; var a = +m[1], b = +m[2], bt = b - b % 10, bu = b % 10;
+      if (bu === 0) return a + " × " + b + " = " + a + " × " + (b / 10) + " × 10 = " + (a * b / 10) + " × 10 = " + (a * b) + ".";
+      return "Split " + b + " into " + bt + " + " + bu + ": " + a + " × " + bt + " = " + (a * bt) + " and " + a + " × " + bu + " = " + (a * bu) + ". Add them: " + (a * bt) + " + " + (a * bu) + " = " + (a * b) + "."; },
+    square: function (q) { var m = q.match(/What is (\d+)²\?/); if (!m) return; var n = +m[1], t = Math.round(n / 10) * 10, r = n - t;
+      if (r === 0) return n + "² = " + (n / 10) + "² × 100 = " + (n * n) + ".";
+      return "Round to the nearest ten and correct: a² = (a − r)(a + r) + r². Here " + n + "² = " + t + " × " + (n + r) + " + " + (r * r) + " = " + (t * (n + r)) + " + " + (r * r) + " = " + (n * n) + "."; },
+    pctof: function (q) { var m = q.match(/What is (\d+)% of (\d+)\?/); if (!m) return; var p = +m[1], x = +m[2], v = p * x / 100;
+      if (p % 25 === 0) return p + "% is " + (p === 25 ? "a quarter" : p === 75 ? "three quarters" : "half") + ": " + x + " × " + fr(p, 100) + " = " + fx(v) + ".";
+      if (p >= 85) return "Easier as 100% − " + (100 - p) + "%: " + (100 - p) + "% of " + x + " is " + fx(x * (100 - p) / 100) + ", so the answer is " + x + " − " + fx(x * (100 - p) / 100) + " = " + fx(v) + ".";
+      if (p === 5) return "5% is half of 10%. 10% of " + x + " is " + fx(x / 10) + ", so 5% is " + fx(v) + ".";
+      var tens = Math.floor(p / 10), five = p % 10 >= 5 ? 1 : 0, ones = p % 10 - 5 * five, parts = [], sum = [];
+      if (tens) { parts.push("10% is " + fx(x / 10)); sum.push((tens > 1 ? tens + " × " : "") + fx(x / 10)); }
+      if (five) { parts.push("5% is " + fx(x / 20)); sum.push(fx(x / 20)); }
+      if (ones) { parts.push("1% is " + fx(x / 100)); sum.push((ones > 1 ? ones + " × " : "") + fx(x / 100)); }
+      return "Build it from easy pieces of " + x + ": " + parts.join(", ") + ". So " + p + "% = " + sum.join(" + ") + " = " + fx(v) + "."; },
+    tofrac: function (q) { var m = q.match(/Write (\d+)\/(\d+) as a decimal/); if (!m) return; var k = +m[1], d = +m[2];
+      if (100 % d === 0) return "Scale the denominator to 100: " + k + "/" + d + " = " + (k * 100 / d) + "/100 = " + fx(k / d) + ".";
+      if (1000 % d === 0) return "Scale the denominator to 1000: " + k + "/" + d + " = " + (k * 1000 / d) + "/1000 = " + fx(k / d) + ".";
+      return "Start from the unit fraction: 1/" + d + " = " + fx(1 / d) + ". Then " + k + "/" + d + " = " + k + " × " + fx(1 / d) + " = " + fx(k / d) + "."; },
+    shake: function (q) { var n = nums(q)[0]; return "Each handshake is one pair of people, so count pairs: " + n + " × " + (n - 1) + " / 2 = " + (n * (n - 1) / 2) + ". (Each person shakes " + (n - 1) + " hands, and dividing by 2 stops each handshake being counted twice.)"; },
+    diag: function (q) { var n = nums(q)[0]; return "From each of the " + n + " corners you can draw a diagonal to " + (n - 3) + " others (not itself or its two neighbors). That counts every diagonal from both ends, so halve it: " + n + " × " + (n - 3) + " / 2 = " + (n * (n - 3) / 2) + "."; },
+    zeros: function (q) { var n = nums(q)[0], t = [], z = 0; for (var p = 5; p <= n; p *= 5) { t.push(Math.floor(n / p)); z += Math.floor(n / p); }
+      return "A trailing zero needs a factor of 10 = 2 × 5. Factors of 2 are plentiful, so count the 5s: multiples of 5 give one each, multiples of 25 an extra one, and so on. " + t.map(function (x, i) { return "⌊" + n + "/" + Math.pow(5, i + 1) + "⌋ = " + x; }).join(", ") + ". Total: " + z + "."; },
+    lastdigit: function (q) { var m = q.match(/last digit of (\d+)\^(\d+)/); if (!m) return; var b = +m[1], e = +m[2], cyc = [], d = b % 10;
+      while (cyc.indexOf(d) < 0) { cyc.push(d); d = d * b % 10; }
+      var L = cyc.length, pos = (e - 1) % L;
+      return "Only last digits matter. Powers of " + b + " end in " + cyc.join(", ") + (L > 1 ? ", then repeat (a cycle of " + L + ")" : " every time") + ". " + (L > 1 ? e + " leaves remainder " + ((e % L) || L) + " in that cycle, so " + b + "^" + e + " ends in " + cyc[pos] + "." : "So " + b + "^" + e + " ends in " + cyc[0] + "."); },
+    lcm: function (q) { var n = nums(q)[1], f = []; [2, 3, 5, 7, 11, 13, 17, 19].forEach(function (p) { if (p > n) return; var k = p; while (k * p <= n) k *= p; f.push(k === p ? String(p) : p + "^" + Math.round(Math.log(k) / Math.log(p))); });
+      var v = 1; for (var i = 2; i <= n; i++) v = lcm(v, i);
+      return "The answer needs the highest power of each prime that appears up to " + n + ": " + f.join(" × ") + " = " + v.toLocaleString() + "."; },
+    geom: function (q) { var m = q.match(/probability ([\d.]+)\. What is the expected number of flips to get (\d+) head/); if (!m) return; var p = +m[1], k = +m[2];
+      return "Each head takes 1/p = 1/" + p + " = " + fx(1 / p) + " flips on average (a geometric wait). The " + k + " wait" + (k > 1 ? "s happen one after another, so add them" : " is all you need") + ": " + k + " × " + fx(1 / p) + " = " + fx(k / p) + "."; },
+    rwhit: function (q) { var m = q.match(/reaches \+(\d+) before −(\d+)/); if (!m) return; var b = +m[1], a = +m[2];
+      return "A fair walk's expected position never changes, so at the end it's still 0. The walk ends at +" + b + " with probability p or at −" + a + " otherwise: p × " + b + " − (1 − p) × " + a + " = 0, so p = " + a + "/(" + a + " + " + b + ") = " + fr(a, a + b) + "."; },
+    rwtime: function (q) { var m = q.match(/hits \+(\d+) or −(\d+)/); if (!m) return; var b = +m[1], a = +m[2];
+      return "For a ±1 walk, (position)² − (steps taken) has a constant expected value of 0, so E[steps] = E[final position²]. The walk ends at +" + b + " with probability " + a + "/" + (a + b) + " and at −" + a + " with probability " + b + "/" + (a + b) + ": E = " + b + "² × " + a + "/" + (a + b) + " + " + a + "² × " + b + "/" + (a + b) + " = " + a + " × " + b + " = " + (a * b) + "."; },
+    ruinfair: function (q) { var m = q.match(/You have \$(\d+) and bet \$1 on fair coin flips until you reach \$(\d+)/); if (!m) return; var a = +m[1], N = +m[2];
+      return "In a fair game your expected wealth stays at $" + a + ". You finish with $" + N + " (probability p) or $0, so " + N + "p = " + a + " and p = " + fr(a, N) + "."; },
+    unifmax: function (q) { var n = nums(q)[0]; return "The max is below t only if all " + n + " draws are, so P(max ≤ t) = t^" + n + " and its density is " + n + "t^" + (n - 1) + ". Then E[max] = ∫₀¹ t × " + n + "t^" + (n - 1) + " dt = " + n + "/" + (n + 1) + ". (General rule: n/(n+1).)"; },
+    unifmin: function (q) { var n = nums(q)[0]; return "Flip every draw to 1 − X: the smallest becomes the largest. The largest of " + n + " uniforms averages " + n + "/" + (n + 1) + ", so the smallest averages 1 − " + n + "/" + (n + 1) + " = 1/" + (n + 1) + "."; },
+    expmin: function (q) { var k = nums(q)[0]; return "All " + k + " clocks are still running at time t with probability (e^(−t))^" + k + " = e^(−" + k + "t). That's an Exponential(" + k + ") tail, so the first ring comes after 1/" + k + " on average."; },
+    coupon: function (q) { var n = nums(q)[0]; return "Split the wait into stages. After seeing i faces, a new face appears with probability (" + n + " − i)/" + n + ", so that stage takes " + n + "/(" + n + " − i) rolls on average. Add the stages: " + n + "/" + n + " + " + n + "/" + (n - 1) + " + … + " + n + "/1 = " + n + " × (1 + 1/2 + … + 1/" + n + ") ≈ " + r4(n * H(n)) + "."; },
+    se: function (q) { var m = q.match(/standard deviation (\d+)\. What is the standard error of the mean of (\d+)/); if (!m) return; var s = +m[1], n = +m[2];
+      return "Averaging n independent draws divides the variance by n, so the spread shrinks by √n: " + s + "/√" + n + " = " + s + "/" + fx(Math.sqrt(n)) + " = " + fx(s / Math.sqrt(n)) + "."; },
+    varlin: function (q) { var m = q.match(/Var\(X\) = (\d+) and Var\(Y\) = (\d+)\. What is Var\((\d+)X ([+−]) (\d+)Y\)/); if (!m) return; var vx = +m[1], vy = +m[2], a = +m[3], b = +m[5];
+      return "Two rules: constants come out squared, and independent variances add with no covariance term" + (m[4] === "−" ? " (so the minus sign disappears: (−" + b + ")² = " + (b * b) + ")" : "") + ". So " + a + "² × " + vx + " + " + b + "² × " + vy + " = " + (a * a * vx) + " + " + (b * b * vy) + " = " + (a * a * vx + b * b * vy) + "."; },
+    corr: function (q) { var x = nums(q.replace(/\(X, Y\)|\(X\)|\(Y\)/g, "")); var c = x[0], sx = x[1], sy = x[2];
+      return "Correlation is covariance with both spreads divided out: ρ = Cov/(SD(X) × SD(Y)) = " + c + "/(" + sx + " × " + sy + ") = " + fx(c / (sx * sy)) + ". It always lands between −1 and 1."; },
+    beta: function (q) { var x = nums(q.replace(/\(X, Y\)|\(X\)|\(Y\)/g, "")); var c = x[0], sx = x[1];
+      return "The OLS slope is Cov(X, Y)/Var(X) = " + c + "/" + sx + "² = " + c + "/" + (sx * sx) + " = " + fx(c / (sx * sx)) + ". On average Y moves that much for each one-unit move in X."; },
+    binmean: function (q) { var m = q.match(/Binomial\((\d+), ([\d.]+)\)/); if (!m) return; var n = +m[1], p = +m[2];
+      return "X counts successes in " + n + " independent trials. Each trial contributes p = " + p + " on average, and expectations add: " + n + " × " + p + " = " + fx(n * p) + "."; },
+    binvar: function (q) { var m = q.match(/Binomial\((\d+), ([\d.]+)\)/); if (!m) return; var n = +m[1], p = +m[2];
+      return "Each trial is a 0/1 variable with variance p(1 − p) = " + p + " × " + fx(1 - p) + " = " + fx(p * (1 - p)) + ". The trials are independent, so variances add: " + n + " × " + fx(p * (1 - p)) + " = " + fx(n * p * (1 - p)) + "."; },
+    straddleup: function (q) { var m = q.match(/\$(\d+) straddle for a total premium of \$(\d+(?:\.\d+)?)/); if (!m) return; var K = +m[1], pr = +m[2];
+      return "A straddle pays |S − K| at expiry. You only profit once the move from $" + K + " covers the $" + pr + " you paid, so the upper breakeven is " + K + " + " + pr + " = " + fx(K + pr) + "."; },
+    straddledn: function (q) { var m = q.match(/\$(\d+) straddle for a total premium of \$(\d+(?:\.\d+)?)/); if (!m) return; var K = +m[1], pr = +m[2];
+      return "A straddle pays |S − K| at expiry. On the downside the stock must fall far enough below $" + K + " to cover the $" + pr + " premium: " + K + " − " + pr + " = " + fx(K - pr) + "."; },
+    gammapnl: function (q) { var m = q.match(/gamma ([\d.]+) per share\. The stock moves \$(\d+)/); if (!m) return; var g = +m[1], d = +m[2];
+      return "Delta hedging cancels the first-order (straight-line) P&L. What's left is the curvature term from a Taylor expansion: ½ × Γ × (ΔS)² = ½ × " + g + " × " + d + "² = " + fx(0.5 * g * d * d) + ". Long gamma gains whichever way the stock moves."; },
+    ztail: function (q) { var z = nums(q)[0];
+      return "Anchor on values worth memorizing: P(Z > 1) ≈ 0.159, P(Z > 1.645) ≈ 0.05, P(Z > 1.96) ≈ 0.025, P(Z > 2) ≈ 0.023, P(Z > 3) ≈ 0.0013. For z = " + z + ": 1 − Φ(" + z + ") ≈ " + r4(1 - Ncdf(z)) + "."; },
+    ntail: function (q) { var m = q.match(/SD (\d+)\. What is P\(X > (\d+)\)/); if (!m) return; var s = +m[1], x = +m[2], z = (x - 100) / s, v = 1 - Ncdf(z);
+      return "Standardize: z = (" + x + " − 100)/" + s + " = " + fx(z) + ". " + (z < 0 ? "Below the mean, so P(X > " + x + ") = 1 − P(Z > " + fx(-z) + ") ≈ " + r4(v) + "." : "P(X > " + x + ") = P(Z > " + fx(z) + ") ≈ " + r4(v) + ". (68–95–99.7 rule: about 16% lies above 1 SD, 2.5% above 2 SD.)"); },
+    pyshift: function (q) { var k = nums(q.replace("1 <<", ""))[0]; return "<< shifts the bits left; each shift doubles the number. Starting from 1 and shifting " + k + " times gives 2^" + k + " = " + Math.pow(2, k).toLocaleString() + "."; },
+    odds: function (q) { var n = nums(q)[0]; return "Try small cases: 1 = 1², 1 + 3 = 2², 1 + 3 + 5 = 3². Each new odd number turns a k × k square into a (k+1) × (k+1) square, so the first " + n + " odd numbers sum to " + n + "² = " + (n * n) + "."; },
+    atleast: function (q) { var m = q.match(/(\d+) times\. What is the probability that a (\d+) appears/); if (!m) return; var k = +m[1], n = +m[2], miss = Math.pow((n - 1) / n, k);
+      return "It's easier to find the chance it never appears. Each roll misses with probability " + (n - 1) + "/" + n + ", and the rolls are independent, so P(never) = (" + (n - 1) + "/" + n + ")^" + k + " ≈ " + r4(miss) + ". So P(at least once) = 1 − " + r4(miss) + " ≈ " + r4(1 - miss) + "."; },
+    binfair: function (q) { var m = q.match(/fair coin (\d+) times\. What is the probability of exactly (\d+) heads/); if (!m) return; var n = +m[1], k = +m[2], c = C(n, k), t = Math.pow(2, n);
+      return "All 2^" + n + " = " + t + " sequences of flips are equally likely. Choosing which " + k + " flips are heads gives C(" + n + "," + k + ") = " + c + " of them. So the probability is " + c + "/" + t + (fr(c, t) !== c + "/" + t ? " = " + fr(c, t) : "") + "."; },
+    binbias: function (q) { var m = q.match(/probability ([\d.]+)\. You flip it (\d+) times\. What is the probability of exactly (\d+) heads/); if (!m) return; var p = +m[1], n = +m[2], k = +m[3], one = Math.pow(p, k) * Math.pow(1 - p, n - k);
+      return "Any one sequence with " + k + " heads and " + (n - k) + " tails has probability " + p + "^" + k + " × " + fx(1 - p) + "^" + (n - k) + " ≈ " + r4(one) + ". There are C(" + n + "," + k + ") = " + C(n, k) + " such sequences, so the total is " + C(n, k) + " × " + r4(one) + " ≈ " + r4(C(n, k) * one) + "."; },
+    bagsame: function (q) { var m = q.match(/holds (\d+) red and (\d+) blue/); if (!m) return; var r = +m[1], b = +m[2], T = C(r + b, 2), x = C(r, 2), y = C(b, 2);
+      return "There are C(" + (r + b) + ",2) = " + T + " equally likely pairs. Same color means both red (C(" + r + ",2) = " + x + " pairs) or both blue (C(" + b + ",2) = " + y + " pairs): (" + x + " + " + y + ")/" + T + " = " + fr(x + y, T) + "."; },
+    bagred: function (q) { var m = q.match(/holds (\d+) red and (\d+) blue/); if (!m) return; var r = +m[1], b = +m[2];
+      return "The first ball is red with probability " + r + "/" + (r + b) + ". After that, " + (r - 1) + " reds remain among " + (r + b - 1) + " balls, so the second is red with probability " + (r - 1) + "/" + (r + b - 1) + ". Multiply: " + fr(r * (r - 1), (r + b) * (r + b - 1)) + "."; },
+    distinct: function (q) { var m = q.match(/fair (?:(\d+)-sided|six-sided) die (\d+) times/); if (!m) return; var n = m[1] ? +m[1] : 6, k = +m[2], hit = 1 - Math.pow((n - 1) / n, k);
+      return "Use linearity: take the faces one at a time. A given face is missed by all " + k + " rolls with probability (" + (n - 1) + "/" + n + ")^" + k + ", so it shows up with probability " + r4(hit) + ". Add that up over " + n + " faces: " + n + " × " + r4(hit) + " ≈ " + r4(n * hit) + "."; },
+    ace: function (q) { var k = nums(q)[0], none = C(48, k) / C(52, k);
+      return "Use the complement. No aces means all " + k + " card" + (k > 1 ? "s come" : " comes") + " from the 48 non-aces: C(48," + k + ")/C(52," + k + ") ≈ " + r4(none) + ". So P(at least one ace) = 1 − " + r4(none) + " ≈ " + r4(1 - none) + "."; },
+    suit: function (q) { var k = nums(q)[0];
+      return "Choose the suit (4 ways), then " + k + " of its 13 cards: 4 × C(13," + k + ") = " + (4 * C(13, k)).toLocaleString() + " hands. All hands: C(52," + k + ") = " + C(52, k).toLocaleString() + ". Divide: ≈ " + r4(4 * C(13, k) / C(52, k)) + "."; },
+    poisson: function (q) { var m = q.match(/averaging ([\d.]+) per hour\. What is the probability of exactly (\d+) events/); if (!m) return; var L = +m[1], k = +m[2];
+      return "A Poisson count with mean λ = " + L + " has P(N = k) = e^(−λ) λ^k / k!. Here e^(−" + L + ") ≈ " + r4(Math.exp(-L)) + ", λ^" + k + " = " + fx(Math.pow(L, k)) + " and " + k + "! = " + fact(k) + ", giving ≈ " + r4(Math.exp(-L) * Math.pow(L, k) / fact(k)) + "."; },
+    sharpe: function (q) { var m = q.match(/averages (\d+) basis points a day with daily volatility ([\d.]+)%/); if (!m) return; var mu = +m[1] / 100, sd = +m[2], d = mu / sd;
+      return "Daily Sharpe = mean ÷ volatility = " + fx(mu) + "% / " + sd + "% = " + fx(d) + ". Over a year the mean grows with the number of days (×252) but volatility only with its square root (×√252), so the ratio grows by √252 ≈ 15.87: " + fx(d) + " × 15.87 ≈ " + r4(d * Math.sqrt(252)) + "."; },
+    hedgec: function (q) { var m = q.match(/long (\d+) call contract.*delta ([\d.]+)\./); if (!m) return; var n = +m[1], d = +m[2];
+      return "Each contract covers 100 shares, so your delta is " + n + " × 100 × " + d + " = " + Math.round(n * 100 * d) + " shares' worth of exposure. Selling that many shares cancels it."; },
+    hedgep: function (q) { var m = q.match(/long (\d+) put contract.*delta −([\d.]+)\./); if (!m) return; var n = +m[1], d = +m[2];
+      return "Puts gain when the stock falls, so their delta is negative: " + n + " × 100 × (−" + d + ") = −" + Math.round(n * 100 * d) + " shares. Buying " + Math.round(n * 100 * d) + " shares brings the total to zero."; },
+    pyfloor: function (q) { var m = q.match(/print\((-?\d+) \/\/ (-?\d+)\)/); if (!m) return; var x = +m[1], y = +m[2], v = Math.floor(x / y);
+      return "// is floor division: it divides, then rounds down toward −∞ (not toward zero). " + x + " / " + y + " = " + fx(x / y) + ", which rounds down to " + v + "." + (x / y < 0 && x % y !== 0 ? " Watch out: rounding toward zero would give " + Math.trunc(x / y) + "." : ""); },
+    pymod: function (q) { var m = q.match(/print\((-?\d+) % (-?\d+)\)/); if (!m) return; var x = +m[1], y = +m[2], qq = Math.floor(x / y), md = x - y * qq;
+      return "Python defines a % b = a − b × (a // b), so the result takes the sign of b. Here " + x + " // " + y + " = " + qq + ", so " + x + " % " + y + " = " + x + " − (" + y + ") × (" + qq + ") = " + md + "."; },
+    rects: function (q) { var m = q.match(/in a (\d+) × (\d+) grid/); if (!m) return; var a = +m[1], b = +m[2];
+      return "A rectangle is fixed by picking 2 of the " + (a + 1) + " horizontal grid lines and 2 of the " + (b + 1) + " vertical ones: C(" + (a + 1) + ",2) × C(" + (b + 1) + ",2) = " + C(a + 1, 2) + " × " + C(b + 1, 2) + " = " + C(a + 1, 2) * C(b + 1, 2) + "."; },
+    arith: function (q) { var m = q.match(/from (\d+) to (\d+)/); if (!m) return; var a = +m[1], b = +m[2], n = b - a + 1;
+      return "Pair the first and last terms: " + a + " + " + b + " = " + (a + b) + ", and every pair moving inward has the same sum. That's " + n + " terms averaging " + fx((a + b) / 2) + ", so the sum is " + n + " × " + fx((a + b) / 2) + " = " + (n * (a + b) / 2).toLocaleString() + "."; },
+    bayes: function (q) { var m = q.match(/affects ([\d.]+)% of people\. A test detects it ([\d.]+)% of the time and falsely flags ([\d.]+)%/); if (!m) return;
+      var pr = +m[1] / 100, se = +m[2] / 100, fp = +m[3] / 100, N = 100000, sick = pr * N, tp = se * sick, fpos = fp * (N - sick);
+      return "Picture " + N.toLocaleString() + " people. " + fx(sick).toLocaleString() + " have the condition and the test catches " + fx(tp) + " of them. Of the " + fx(N - sick) + " healthy people, " + fx(fpos) + " are falsely flagged. So of the " + fx(tp + fpos) + " positives, " + fx(tp) + " really have it: " + fx(tp) + " / " + fx(tp + fpos) + " ≈ " + r4(tp / (tp + fpos)) + ". When a condition is rare, false positives can outnumber true ones."; },
+    bdaypairs: function (q) { var n = nums(q)[0];
+      return "Use linearity over pairs. There are C(" + n + ",2) = " + C(n, 2) + " pairs, and each pair shares a birthday with probability 1/365. Expected matching pairs: " + C(n, 2) + "/365 ≈ " + r4(C(n, 2) / 365) + ". No independence is needed, which is why linearity is so useful."; },
+    dicesum: function (q) { var m = q.match(/two (?:fair (\d+)-sided|fair six-sided) dice\. What is the probability the sum is exactly (\d+)/); if (!m) return; var n = m[1] ? +m[1] : 6, s = +m[2], pairs = [];
+      for (var i = 1; i <= n; i++) { var j = s - i; if (j >= 1 && j <= n) pairs.push("(" + i + "," + j + ")"); }
+      return "There are " + n + " × " + n + " = " + (n * n) + " equally likely ordered outcomes. The ones summing to " + s + " are " + (pairs.length <= 8 ? pairs.join(", ") : pairs.slice(0, 3).join(", ") + ", …, " + pairs[pairs.length - 1]) + ": " + pairs.length + " in total. So the probability is " + pairs.length + "/" + (n * n) + (fr(pairs.length, n * n) !== pairs.length + "/" + (n * n) ? " = " + fr(pairs.length, n * n) : "") + "."; },
+    stairs2: function (q) { var n = nums(q)[0], f = [1, 1]; for (var i = 2; i <= n; i++) f.push(f[i - 1] + f[i - 2]);
+      return "Look at the last move: it's either 1 stair (leaving " + (n - 1) + " to climb before it) or 2 stairs (leaving " + (n - 2) + "). So f(n) = f(n − 1) + f(n − 2), with f(1) = 1 and f(2) = 2. Building up: " + f.slice(1, n + 1).join(", ") + ". So f(" + n + ") = " + f[n] + "."; },
+    portvol: function (q) { var m = q.match(/holds (\d+)% in asset A \(vol (\d+)%\) and (\d+)% in asset B \(vol (\d+)%\), correlation (-?\d+(?:\.\d+)?)/); if (!m) return;
+      var w1 = +m[1] / 100, s1 = +m[2] / 100, w2 = +m[3] / 100, s2 = +m[4] / 100, rho = +m[5], a = w1 * w1 * s1 * s1, b = w2 * w2 * s2 * s2, c = 2 * w1 * w2 * rho * s1 * s2, v = Math.sqrt(a + b + c);
+      return "Portfolio variance = w₁²σ₁² + w₂²σ₂² + 2w₁w₂ρσ₁σ₂ = " + r4(a) + " + " + r4(b) + (c < 0 ? " − " + r4(-c) : " + " + r4(c)) + " = " + r4(a + b + c) + ". Take the square root for volatility: ≈ " + r4(v) + ". " + (rho < 1 ? "Because ρ < 1, that's below the weighted average of the two vols (" + r4(w1 * s1 + w2 * s2) + "): diversification." : "With ρ = 1 there's no diversification: it equals the weighted average of the vols."); },
+    parityp: function (q) { var m = q.match(/Stock \$(\d+), a \$(\d+) call costs \$([\d]+\.\d+)\./); if (!m) return; var S = +m[1], K = +m[2], c = +m[3];
+      return "A long call plus a short put pays S − K at expiry no matter what, the same as owning the stock and owing K. With zero rates their prices must match: C − P = S − K. So P = C − S + K = " + c + " − " + S + " + " + K + " = $" + (c - S + K).toFixed(2) + "."; },
+    parityc: function (q) { var m = q.match(/Stock \$(\d+), a \$(\d+) put costs \$([\d]+\.\d+)\./); if (!m) return; var S = +m[1], K = +m[2], p = +m[3];
+      return "A long call plus a short put pays S − K at expiry no matter what, the same as owning the stock and owing K. With zero rates: C − P = S − K. So C = P + S − K = " + p + " + " + S + " − " + K + " = $" + (p + S - K).toFixed(2) + "."; },
+    words: function (q) { var m = q.match(/letters in ([A-Z]+)\?/); if (!m) return; var w = m[1], cnt = {}; w.split("").forEach(function (ch) { cnt[ch] = (cnt[ch] || 0) + 1; });
+      var reps = Object.keys(cnt).filter(function (ch) { return cnt[ch] > 1; }), den = 1; reps.forEach(function (ch) { den *= fact(cnt[ch]); });
+      if (!reps.length) return "All " + w.length + " letters are different, so every ordering is a new word: " + w.length + "! = " + fact(w.length).toLocaleString() + ".";
+      return "Start with all " + w.length + "! = " + fact(w.length).toLocaleString() + " orderings, as if every letter were different. Swapping identical letters doesn't create a new word, so divide by " + reps.map(function (ch) { return cnt[ch] + "! for the " + cnt[ch] + " " + ch + "s"; }).join(" and ") + ": " + fact(w.length).toLocaleString() + " / " + den + " = " + (fact(w.length) / den).toLocaleString() + "."; },
+    squares: function (q) { var n = nums(q)[0], sq = 0; for (var i = 1; i <= n; i++) sq += i * i; return "Count by size: a k × k square fits in (" + n + " − k + 1)² positions. Adding sizes 1 to " + n + " gives " + n + "² + " + (n - 1) + "² + … + 1² = " + sq + "."; }
+  };
+  OUT.forEach(function (p) {
+    var f = EXPLAIN[p.key.replace(/-\d+$/, "")];
+    if (!f) return;
+    try { var e = f(p.q); if (e) p.ex = e; else p.exMiss = true; } catch (err) { p.exMiss = true; }
+  });
+
   window.EDGE_GENERATED = OUT;
 })();

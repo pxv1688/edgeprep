@@ -434,7 +434,11 @@
       var inside = b <= t && t <= a, s = inside ? Math.round(100 * b / a) : -40;
       pnl += s; $("#mmP").textContent = pnl;
       $("#mmFb").className = "fb " + (inside ? "good" : "bad");
-      $("#mmFb").textContent = "True value " + t.toLocaleString() + ". " + (inside ? "Inside your quote, +" + s + "." : "Picked off, −40.");
+      var width = a / b, coach;
+      if (inside) coach = width <= 1.25 ? "Tight and right: a sharp quote." : width <= 2 ? "Good quote. Your ask was " + width.toFixed(1) + "× your bid; tighten it when you're confident." : "Safe but wide: your ask was " + width.toFixed(1) + "× your bid. Interviewers push for tighter markets, so anchor on something you know and narrow it.";
+      else if (t < b) coach = "Your whole quote was too high: the true value is " + (b / t >= 10 ? Math.round(b / t) + "×" : Math.round(100 * (b - t) / t) + "%") + " below your bid. Recheck your anchor before quoting.";
+      else coach = "Your whole quote was too low: the true value is " + (t / a >= 10 ? Math.round(t / a) + "×" : Math.round(100 * (t - a) / a) + "%") + " above your ask. When unsure, widen toward the side you're least sure about.";
+      $("#mmFb").textContent = "True value " + t.toLocaleString() + ". " + (inside ? "Inside your quote, +" + s + ". " : "Picked off, −40. ") + coach;
       this.disabled = true; var n = $("#mmNext"); n.hidden = false; n.textContent = "Next round"; n.onclick = function () { k++; load(); }; n.focus();
     };
     $("#mmA").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#mmGo").click(); });
