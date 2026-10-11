@@ -1,7 +1,7 @@
 :root{
   --ground:#E9EDF8; --paper:#FFFFFF; --ink:#0B0C12; --muted:#454E72; --rule:#0B0C12; --hair:#C5CCE4;
   --cobalt:#1E3FA8; --cobalt-deep:#162F80; --on-cobalt:#FFFFFF; --on-cobalt-dim:#C9D3F5;
-  --yellow:#FFC93C; --on-yellow:#0B0C12; --wash:#DDE3F5; --void:#0B0C12; --on-void:#9AA3C7; --sel:#1E3FA8;
+  --yellow:#FFC93C; --on-yellow:#0B0C12; --wash:#DDE3F5; --void:#0B0C12; --on-void:#9AA3C7; --sel:#1E3FA8; --easy:#16834A; --med:#D9741C; --hard:#C42B2B;
   --good:#11724A; --bad:#B7282E;
   --display:"Archivo", "Arial Narrow", "Helvetica Neue", sans-serif;
   --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
@@ -10,11 +10,11 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --ground:#0C1230; --paper:#141B3F; --ink:#F1F3FB; --muted:#A8B1D8; --rule:#E6E9F7; --hair:#2B3566;
   --cobalt:#2448C2; --cobalt-deep:#1A3698; --on-cobalt:#FFFFFF; --on-cobalt-dim:#C9D3F5;
-  --yellow:#FFC93C; --on-yellow:#0B0C12; --wash:#1D2655; --void:#04061A; --on-void:#7C86B5; --sel:#FFC93C; --good:#4CC98F; --bad:#FF7A72; color-scheme:dark}}
+  --yellow:#FFC93C; --on-yellow:#0B0C12; --wash:#1D2655; --void:#04061A; --on-void:#7C86B5; --sel:#FFC93C; --easy:#4CC98F; --med:#F29A4A; --hard:#FF6B5E; --good:#4CC98F; --bad:#FF7A72; color-scheme:dark}}
 :root[data-theme="dark"]{
   --ground:#0C1230; --paper:#141B3F; --ink:#F1F3FB; --muted:#A8B1D8; --rule:#E6E9F7; --hair:#2B3566;
   --cobalt:#2448C2; --cobalt-deep:#1A3698; --on-cobalt:#FFFFFF; --on-cobalt-dim:#C9D3F5;
-  --yellow:#FFC93C; --on-yellow:#0B0C12; --wash:#1D2655; --void:#04061A; --on-void:#7C86B5; --sel:#FFC93C; --good:#4CC98F; --bad:#FF7A72; color-scheme:dark}
+  --yellow:#FFC93C; --on-yellow:#0B0C12; --wash:#1D2655; --void:#04061A; --on-void:#7C86B5; --sel:#FFC93C; --easy:#4CC98F; --med:#F29A4A; --hard:#FF6B5E; --good:#4CC98F; --bad:#FF7A72; color-scheme:dark}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -404,3 +404,20 @@ details.faq p{margin-top:8px;color:var(--ink);max-width:68ch}
 .focus-strip .cell.on sup{color:var(--paper)}
 .focus-card{padding:28px}
 @media (max-width:560px){.focus-bar #fPos{order:3;flex-basis:100%}.focus-card{padding:18px}}
+
+/* ---------- difficulty marks: bottom strip, length and colour both encode level ---------- */
+.bank .cell.d1,.bank .cell.d2,.bank .cell.d3{overflow:hidden}
+.bank .cell.d1::after,.bank .cell.d2::after,.bank .cell.d3::after{content:"";position:absolute;left:0;bottom:0;height:5px}
+.bank .cell.d1::after{width:34%;background:var(--easy)}
+.bank .cell.d2::after{width:67%;background:var(--med)}
+.bank .cell.d3::after{width:100%;background:var(--hard)}
+.dlegend{display:flex;gap:14px;flex-wrap:wrap;margin:0;font:600 12px var(--body);color:var(--muted)}
+.dlegend span{display:inline-flex;align-items:center;gap:6px}
+.ds{display:inline-block;width:18px;height:14px;border:1.5px solid var(--rule);background:var(--paper);position:relative;overflow:hidden}
+.ds::after{content:"";position:absolute;left:0;bottom:0;height:4px}
+.ds.d1::after{width:34%;background:var(--easy)}
+.ds.d2::after{width:67%;background:var(--med)}
+.ds.d3::after{width:100%;background:var(--hard)}
+.ds.sv{background:var(--yellow)}
+.chip.dc1 .dots{color:var(--easy)} .chip.dc2 .dots{color:var(--med)} .chip.dc3 .dots{color:var(--hard)}
+.chip[aria-pressed="true"] .dots{color:inherit}

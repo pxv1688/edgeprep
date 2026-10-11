@@ -290,8 +290,8 @@
         '<section class="sheet pad stack" aria-label="Problems">' +
           '<div class="row"><label class="lab" for="bankQ" style="position:absolute;left:-9999px">Search problems</label><input class="field" id="bankQ" type="search" placeholder="Search: dice, Bayes, straddle, Python…" autocomplete="off" style="font-size:16px;font-weight:500"><button class="btn go" id="randBtn">Random unsolved</button></div>' +
           '<div class="filters" role="group" aria-label="Filter by set"><button class="chip" data-set="all" aria-pressed="true">All</button>' + SETS.map(function (s) { return '<button class="chip" data-set="' + s.id + '" aria-pressed="false">' + s.name + "</button>"; }).join("") + "</div>" +
-          '<div class="filters" role="group" aria-label="Filter by difficulty"><button class="chip" data-diff="0" aria-pressed="true">Any level</button><button class="chip" data-diff="1" aria-pressed="false">' + dots(1) + ' Warm-up</button><button class="chip" data-diff="2" aria-pressed="false">' + dots(2) + ' Interview</button><button class="chip" data-diff="3" aria-pressed="false">' + dots(3) + ' Hard</button><button class="chip" id="openOnly" aria-pressed="false">Unsolved only</button><button class="chip" id="savedOnly" aria-pressed="' + f.saved + '">' + BOOKMARK + ' Saved</button></div>' +
-          '<p class="sub num" id="count" aria-live="polite"></p><div class="bank bank-wide" id="grid"></div>' +
+          '<div class="filters" role="group" aria-label="Filter by difficulty"><button class="chip" data-diff="0" aria-pressed="true">Any level</button><button class="chip dc1" data-diff="1" aria-pressed="false">' + dots(1) + ' Warm-up</button><button class="chip dc2" data-diff="2" aria-pressed="false">' + dots(2) + ' Interview</button><button class="chip dc3" data-diff="3" aria-pressed="false">' + dots(3) + ' Hard</button><button class="chip" id="openOnly" aria-pressed="false">Unsolved only</button><button class="chip" id="savedOnly" aria-pressed="' + f.saved + '">' + BOOKMARK + ' Saved</button></div>' +
+          '<div class="row between"><p class="sub num" id="count" aria-live="polite"></p><p class="dlegend" aria-hidden="true"><span><i class="ds d1"></i>Warm-up</span><span><i class="ds d2"></i>Interview</span><span><i class="ds d3"></i>Hard</span><span><i class="ds sv"></i>Solved</span></p></div><div class="bank bank-wide" id="grid"></div>' +
           '<div class="row between" id="pager"><button class="btn alt" id="prevP">Previous page</button><span class="sub num" id="pageN"></span><button class="btn alt" id="nextP">Next page</button></div>' +
         "</section>" +
       "</div>" +
@@ -306,7 +306,7 @@
     }
     function cellHTML(p, extra) {
       var s = S.solved[p.key];
-      return '<button class="cell' + (s ? " solved" : "") + (cur && cur.key === p.key ? " on" : "") + (extra || "") + '" data-key="' + p.key + '" aria-label="Problem ' + p.n + ", " + setName(p.set) + (s ? ", solved" : "") + (cur && cur.key === p.key ? ", current" : "") + '"><sup>' + p.n + "</sup>" + (s ? CHECK : "") + "</button>";
+      return '<button class="cell d' + p.diff + (s ? " solved" : "") + (cur && cur.key === p.key ? " on" : "") + (extra || "") + '" data-key="' + p.key + '" title="' + ["", "Warm-up", "Interview", "Hard"][p.diff] + '" aria-label="Problem ' + p.n + ", " + setName(p.set) + ", " + ["", "warm-up", "interview level", "hard"][p.diff] + (s ? ", solved" : "") + (cur && cur.key === p.key ? ", current" : "") + '"><sup>' + p.n + "</sup>" + (s ? CHECK : "") + "</button>";
     }
     function draw() {
       var L = list(), solved = 0; L.forEach(function (p) { if (S.solved[p.key]) solved++; });
