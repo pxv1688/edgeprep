@@ -282,59 +282,94 @@
   };
 
   V.bank = function (app, arg) {
-    var PAGE = 160, f = {set: "all", diff: 0, open: false, q: "", saved: arg === "saved"}, cur = null, page = 0;
+    var PAGE = 160, f = {set: "all", diff: 0, open: false, q: "", saved: arg === "saved"}, cur = null, page = 0, scrollY0 = 0;
     var total = BANK.length.toLocaleString();
     app.innerHTML =
-      '<div class="stack"><h1>Problem Bank</h1><p class="lede">' + total + " problems across probability, brainteasers, options, statistics, code and mental math. Every square you solve turns yellow. Fractions like 3/8 are accepted.</p></div>" +
-      '<div class="split">' +
+      '<div id="browse" class="stack">' +
+        '<div class="stack"><h1>Problem Bank</h1><p class="lede">' + total + " problems across probability, brainteasers, options, statistics, code and mental math. Pick any square to open it. Solved squares turn yellow.</p></div>" +
         '<section class="sheet pad stack" aria-label="Problems">' +
           '<div class="row"><label class="lab" for="bankQ" style="position:absolute;left:-9999px">Search problems</label><input class="field" id="bankQ" type="search" placeholder="Search: dice, Bayes, straddle, Python…" autocomplete="off" style="font-size:16px;font-weight:500"><button class="btn go" id="randBtn">Random unsolved</button></div>' +
           '<div class="filters" role="group" aria-label="Filter by set"><button class="chip" data-set="all" aria-pressed="true">All</button>' + SETS.map(function (s) { return '<button class="chip" data-set="' + s.id + '" aria-pressed="false">' + s.name + "</button>"; }).join("") + "</div>" +
           '<div class="filters" role="group" aria-label="Filter by difficulty"><button class="chip" data-diff="0" aria-pressed="true">Any level</button><button class="chip" data-diff="1" aria-pressed="false">' + dots(1) + ' Warm-up</button><button class="chip" data-diff="2" aria-pressed="false">' + dots(2) + ' Interview</button><button class="chip" data-diff="3" aria-pressed="false">' + dots(3) + ' Hard</button><button class="chip" id="openOnly" aria-pressed="false">Unsolved only</button><button class="chip" id="savedOnly" aria-pressed="' + f.saved + '">' + BOOKMARK + ' Saved</button></div>' +
-          '<p class="sub num" id="count" aria-live="polite"></p><div class="bank" id="grid"></div>' +
-          '<div class="row between" id="pager"><button class="btn alt" id="prevP">Previous</button><span class="sub num" id="pageN"></span><button class="btn alt" id="nextP">Next</button></div>' +
+          '<p class="sub num" id="count" aria-live="polite"></p><div class="bank bank-wide" id="grid"></div>' +
+          '<div class="row between" id="pager"><button class="btn alt" id="prevP">Previous page</button><span class="sub num" id="pageN"></span><button class="btn alt" id="nextP">Next page</button></div>' +
         "</section>" +
-        '<section class="sheet pad stack" id="pane" aria-live="polite"></section>' +
+      "</div>" +
+      '<div id="focus" class="focus stack" hidden>' +
+        '<div class="focus-bar"><button class="btn alt" id="fBack">← All problems</button><span class="sub num" id="fPos"></span><div class="row"><button class="btn alt" id="fPrev" aria-label="Previous problem">← Prev</button><button class="btn alt" id="fNext" aria-label="Next problem">Next →</button></div></div>' +
+        '<div class="bank focus-strip" id="fStrip" aria-label="Nearby problems"></div>' +
+        '<section class="sheet pad stack focus-card" id="pane" aria-live="polite"></section>' +
       "</div>";
     function list() {
       var q = f.q.toLowerCase();
       return BANK.filter(function (p) { return (f.set === "all" || p.set === f.set) && (!f.diff || p.diff === f.diff) && (!f.open || !S.solved[p.key]) && (!f.saved || (S.saved && S.saved[p.key])) && (!q || (p.q + " " + (p.topic || "") + " " + setName(p.set)).toLowerCase().indexOf(q) >= 0); });
     }
+    function cellHTML(p, extra) {
+      var s = S.solved[p.key];
+      return '<button class="cell' + (s ? " solved" : "") + (cur && cur.key === p.key ? " on" : "") + (extra || "") + '" data-key="' + p.key + '" aria-label="Problem ' + p.n + ", " + setName(p.set) + (s ? ", solved" : "") + (cur && cur.key === p.key ? ", current" : "") + '"><sup>' + p.n + "</sup>" + (s ? CHECK : "") + "</button>";
+    }
     function draw() {
       var L = list(), solved = 0; L.forEach(function (p) { if (S.solved[p.key]) solved++; });
       var pages = Math.max(1, Math.ceil(L.length / PAGE)); if (page >= pages) page = pages - 1;
       $("#count").textContent = solved.toLocaleString() + " of " + L.length.toLocaleString() + " solved in this view";
-      $("#grid").innerHTML = L.slice(page * PAGE, page * PAGE + PAGE).map(function (p) {
-        var s = S.solved[p.key];
-        return '<button class="cell' + (s ? " solved" : "") + (cur && cur.key === p.key ? " on" : "") + '" data-key="' + p.key + '" aria-label="Problem ' + p.n + ", " + setName(p.set) + (s ? ", solved" : "") + '"><sup>' + p.n + "</sup>" + (s ? CHECK : "") + "</button>";
-      }).join("") || (f.saved && !Object.keys(S.saved || {}).length ? '<p class="sub">No saved problems yet. Press Save (or S) on any problem to keep it here.</p>' : '<p class="sub">No problems match. Clear the search or pick another set.</p>');
+      $("#grid").innerHTML = L.slice(page * PAGE, page * PAGE + PAGE).map(function (p) { return cellHTML(p); }).join("") ||
+        (f.saved && !Object.keys(S.saved || {}).length ? '<p class="sub">No saved problems yet. Press Save (or S) on any problem to keep it here.</p>' : '<p class="sub">No problems match. Clear the search or pick another set.</p>');
       $("#pageN").textContent = "Page " + (page + 1) + " of " + pages;
       $("#prevP").disabled = page === 0; $("#nextP").disabled = page >= pages - 1;
       $("#pager").hidden = pages < 2;
     }
-    function open(p, scroll) {
-      cur = p; draw();
+    function drawFocus() {
+      var L = list(), i = L.indexOf(cur);
+      if (i < 0) { L = [cur]; i = 0; }
+      $("#fPos").textContent = "Problem " + (i + 1).toLocaleString() + " of " + L.length.toLocaleString() + " in this view";
+      $("#fPrev").disabled = i === 0; $("#fNext").disabled = i >= L.length - 1;
+      var span = innerWidth < 600 ? 4 : 8, lo = Math.max(0, i - span), hi = Math.min(L.length, lo + 2 * span + 1); lo = Math.max(0, hi - 2 * span - 1);
+      $("#fStrip").innerHTML = L.slice(lo, hi).map(function (p) { return cellHTML(p); }).join("");
+    }
+    function neighbor(step) { var L = list(), i = L.indexOf(cur); return i < 0 ? null : L[i + step] || null; }
+    function open(p) {
+      if (!p) return;
+      if ($("#focus").hidden) scrollY0 = scrollY;
+      cur = p;
+      $("#browse").hidden = true; $("#focus").hidden = false;
+      drawFocus();
       problemWidget($("#pane"), p, {
-        next: function () { var L = list().filter(function (q) { return !S.solved[q.key] && q.key !== p.key; }); open(L.filter(function (q) { return q.n > p.n; })[0] || L[0] || p, true); },
-        onDone: function (ok) { draw(); if (ok) { var c = $('[data-key="' + p.key + '"]'); if (c) c.classList.add("stamp"); } }
+        next: function () { var n = neighbor(1) || list().filter(function (q) { return !S.solved[q.key]; })[0]; if (n) open(n); },
+        onDone: function (ok) { drawFocus(); if (ok) { var c = $('#fStrip [data-key="' + p.key + '"]'); if (c) c.classList.add("stamp"); } }
       });
-      if (scroll && innerWidth < 900) $("#pane").scrollIntoView({behavior: "smooth", block: "start"});
+      scrollTo(0, 0);
+      var inp = $("#pane input.field"); if (inp && innerWidth >= 900) inp.focus({preventScroll: true});
+    }
+    function back() {
+      $("#focus").hidden = true; $("#browse").hidden = false;
+      var L = list(), i = cur ? L.indexOf(cur) : -1; if (i >= 0) page = Math.floor(i / PAGE);
+      draw(); scrollTo(0, scrollY0);
+      var c = cur && $('#grid [data-key="' + cur.key + '"]'); if (c) c.focus({preventScroll: true});
     }
     var tq;
     $("#bankQ").addEventListener("input", function () { var v = this.value; clearTimeout(tq); tq = setTimeout(function () { f.q = v.trim(); page = 0; draw(); }, 150); });
+    document.addEventListener("keydown", function keys(e) {
+      if (!document.body.contains(app)) { document.removeEventListener("keydown", keys); return; }
+      if ($("#focus").hidden || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === "Escape") { e.preventDefault(); back(); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); open(neighbor(1)); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); open(neighbor(-1)); }
+    });
     app.addEventListener("click", function (e) {
-      var b = e.target.closest("button"); if (!b) return;
+      var b = e.target.closest("button"); if (!b || b.closest("#pane")) return;
       if (b.dataset.set) { f.set = b.dataset.set; page = 0; $$("[data-set]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); draw(); }
       else if (b.dataset.diff !== undefined) { f.diff = +b.dataset.diff; page = 0; $$("[data-diff]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); draw(); }
       else if (b.id === "openOnly") { f.open = !f.open; page = 0; b.setAttribute("aria-pressed", f.open); draw(); }
       else if (b.id === "savedOnly") { f.saved = !f.saved; page = 0; b.setAttribute("aria-pressed", f.saved); draw(); }
       else if (b.id === "prevP") { page--; draw(); $("#grid").scrollIntoView({block: "nearest"}); }
       else if (b.id === "nextP") { page++; draw(); $("#grid").scrollIntoView({block: "nearest"}); }
-      else if (b.id === "randBtn") { var L = list().filter(function (q) { return !S.solved[q.key]; }); if (L.length) { var p = L[Math.random() * L.length | 0]; page = Math.floor(list().indexOf(p) / PAGE); open(p, true); } }
-      else if (b.dataset.key) open(BY_KEY[b.dataset.key], true);
+      else if (b.id === "randBtn") { var L = list().filter(function (q) { return !S.solved[q.key]; }); if (L.length) open(L[Math.random() * L.length | 0]); }
+      else if (b.id === "fBack") back();
+      else if (b.id === "fPrev") open(neighbor(-1));
+      else if (b.id === "fNext") open(neighbor(1));
+      else if (b.dataset.key) open(BY_KEY[b.dataset.key]);
     });
-    var first = list()[0] || BANK.filter(function (p) { return !S.solved[p.key]; })[0] || BANK[0];
-    open(first);
+    draw();
   };
 
   V.math = function (app) {

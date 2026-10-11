@@ -394,3 +394,13 @@ details.faq p{margin-top:8px;color:var(--ink);max-width:68ch}
 .rep-box select,.rep-box textarea{width:100%}
 .rep-box textarea{font:500 15px/1.5 var(--body);color:var(--ink);background:var(--paper);border:2px solid var(--rule);padding:10px 12px;resize:vertical}
 .callout.danger{border-color:var(--bad)}
+
+/* ---------- problem bank: browse grid + focused problem ---------- */
+.bank-wide{grid-template-columns:repeat(auto-fill,minmax(48px,1fr))}
+.focus{max-width:880px;margin:0 auto;width:100%}
+.focus-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.focus-strip{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
+.focus-strip .cell.on{background:var(--ink);color:var(--paper);outline:none}
+.focus-strip .cell.on sup{color:var(--paper)}
+.focus-card{padding:28px}
+@media (max-width:560px){.focus-bar #fPos{order:3;flex-basis:100%}.focus-card{padding:18px}}
