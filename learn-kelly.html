@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Kelly criterion | Edge lessons</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="How much to bet with an edge: the Kelly criterion formula, why it maximizes growth, why over-betting ruins you, and fractional Kelly.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="The Kelly criterion | Edge lessons">
+<meta property="og:description" content="How much to bet with an edge: the Kelly criterion formula, why it maximizes growth, why over-betting ruins you, and fractional Kelly.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css?v=202610111921">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<article class="doc lesson">
+  <p class="sub"><a href="learn.html">Lessons</a> · Risk</p>
+  <h1>The Kelly criterion: how much to bet</h1>
+  <p class="lede" style="margin-top:12px">Having an edge isn't enough. Bet too much and you go broke anyway; bet too little and you leave growth on the table. The Kelly criterion gives the bet size that grows your bankroll fastest over the long run.</p>
+
+  <h2>The formula</h2>
+  <p>For a bet that wins with probability p, loses with probability q = 1 − p, and pays b to 1 (you win $b per $1 staked), the Kelly fraction of your bankroll is</p>
+  <p class="formula">f* = (b·p − q) / b</p>
+  <p>For an even-money bet (b = 1) this simplifies to <b>f* = p − q = 2p − 1</b>. A coin that wins 60% of the time at even money: bet 20% of your bankroll each flip.</p>
+  <p>If b·p − q ≤ 0, the bet has no edge and Kelly says bet nothing.</p>
+
+  <h2>Why it works</h2>
+  <p>Repeated bets multiply your wealth. After many bets, what matters is the average of the <b>logarithm</b> of the growth factor per bet. Kelly is the fraction that maximizes</p>
+  <p class="formula">g(f) = p · ln(1 + b·f) + q · ln(1 − f)</p>
+  <p>Setting the derivative to zero gives f* = (bp − q)/b. Because it maximizes long-run growth, a Kelly bettor eventually overtakes any strategy that bets a different fixed fraction.</p>
+
+  <h2>Over-betting is worse than under-betting</h2>
+  <p>Growth falls off steeply above the Kelly fraction. At even money with p = 0.6, betting 20% grows wealth about 2% per bet in log terms. Betting 40% grows it at roughly zero, and betting more than that shrinks it, even though every single bet has a positive expected value. That's the lesson the Betting Table game teaches: positive expected value is not the same as positive growth.</p>
+
+  <h2>Fractional Kelly</h2>
+  <p>In real trading, your p and b are estimates. Because over-betting is so costly, traders often bet <b>half Kelly</b>. It gives up a little growth for much smaller swings, and it protects you if your edge is smaller than you think.</p>
+
+  <h2>Worked example</h2>
+  <p>A bet pays 2 to 1 and wins 40% of the time. Expected value per $1: 0.4 × 2 − 0.6 = +$0.20. Kelly: f* = (2 × 0.4 − 0.6)/2 = 0.10, so bet 10% of your bankroll.</p>
+
+  <h2>Practice</h2>
+  <div class="embed-q" data-find="An even-money bet wins 55% of the time"></div>
+  <div class="embed-q" data-find="wins 40% of the time. What fraction of your bankroll does Kelly"></div>
+  <div class="embed-q" data-find="A bet pays 2 to 1 and wins 60% of the time"></div>
+  <p class="lesson-next">Play it: <a href="app.html#bet">the Betting Table game</a> · Next: <a href="learn-making-markets.html">Making markets</a></p>
+</article>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="learn.html">Learn</a>
+  <a href="quant-interview-questions.html">Interview questions</a>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js?v=202610111921"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="assets/auth.js?v=202610111921"></script>
+<script src="assets/site.js?v=202610111921"></script>
+<script src="assets/data.js?v=202610111921"></script>
+<script src="assets/generators.js?v=202610111921"></script>
+<script src="assets/embed.js?v=202610111921"></script>
+</body>
+</html>

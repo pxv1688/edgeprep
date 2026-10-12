@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sign in to Edge</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="Sign in or create a free Edge account to sync your quant interview practice.">
 <meta name="robots" content="noindex">
@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
-<link rel="stylesheet" href="assets/edge.css?v=202610111636">
+<link rel="stylesheet" href="assets/edge.css?v=202610111921">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -51,6 +51,11 @@
     <p class="lede">Sign in to sync your streak, solved problems and ratings across devices, and to appear on the leaderboard.</p>
     <div id="off" class="callout" hidden>Accounts are coming soon. You can practice right now without one; your progress is saved in this browser.</div>
     <div id="on">
+      <div class="stack" id="gBox" hidden style="margin-bottom:18px">
+        <button class="btn google big-btn" id="gBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" class="ico"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7Z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3a7.2 7.2 0 0 1-10.8-3.8H1.3v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1Z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1A7.2 7.2 0 0 1 12 4.8Z"/></svg><span>Continue with Google</span></button>
+        <p class="fb" id="gFb" aria-live="polite"></p>
+        <p class="or"><span>or use email</span></p>
+      </div>
       <div class="tabs" role="tablist" aria-label="Account options">
         <button role="tab" id="t-in" aria-selected="true" aria-controls="p-in">Sign in</button>
         <button role="tab" id="t-up" aria-selected="false" aria-controls="p-up">Create account</button>
@@ -91,20 +96,29 @@
 ﻿</main>
 <footer>
   <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="learn.html">Learn</a>
+  <a href="quant-interview-questions.html">Interview questions</a>
   <a href="leaderboard.html">Leaderboard</a>
   <a href="about.html">About &amp; FAQ</a>
   <a href="privacy.html">Privacy</a>
   <a href="terms.html">Terms</a>
   <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
 </footer>
-<script src="assets/config.js?v=202610111636"></script>
+<script src="assets/config.js?v=202610111921"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
-<script src="assets/auth.js?v=202610111636"></script>
-<script src="assets/site.js?v=202610111636"></script>
+<script src="assets/auth.js?v=202610111921"></script>
+<script src="assets/site.js?v=202610111921"></script>
 <script>
 (function () {
   var A = window.EdgeAuth;
   if (!A.configured) { document.getElementById("off").hidden = false; document.getElementById("on").hidden = true; return; }
+  if (A.googleEnabled) {
+    document.getElementById("gBox").hidden = false;
+    document.getElementById("gBtn").onclick = function () {
+      var b = this, fb = document.getElementById("gFb"); b.disabled = true; fb.className = "fb"; fb.textContent = "Opening Google…";
+      A.signInWithGoogle().catch(function () { b.disabled = false; fb.className = "fb bad"; fb.textContent = "Google sign-in isn't available right now. Use email instead."; });
+    };
+  }
   var tabs = ["in", "up", "re"];
   function show(id) { tabs.forEach(function (t) { document.getElementById("t-" + t).setAttribute("aria-selected", t === id); document.getElementById("p-" + t).hidden = t !== id; }); }
   tabs.forEach(function (t) { document.getElementById("t-" + t).onclick = function () { show(t); }; });

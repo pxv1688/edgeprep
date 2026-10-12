@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Expected value and linearity | Edge lessons</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="How to solve 'on average' interview questions: expected value, linearity of expectation, indicators and geometric waiting times, with practice problems.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Expected value and linearity | Edge lessons">
+<meta property="og:description" content="How to solve 'on average' interview questions: expected value, linearity of expectation, indicators and geometric waiting times, with practice problems.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css?v=202610111921">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<article class="doc lesson">
+  <p class="sub"><a href="learn.html">Lessons</a> · Probability</p>
+  <h1>Expected value and linearity</h1>
+  <p class="lede" style="margin-top:12px">Expected value is the single most-used idea in quant interviews. Most "how many on average" questions become easy once you know two tools: linearity of expectation and geometric waiting times.</p>
+
+  <h2>What expected value means</h2>
+  <p>The expected value of a random quantity is its probability-weighted average: multiply each outcome by its probability and add. For one roll of a fair die:</p>
+  <p class="formula">E[X] = (1 + 2 + 3 + 4 + 5 + 6) × 1/6 = 3.5</p>
+  <p>It's the long-run average, not a value you expect to see on any single roll. That's why traders think in expected value: over many trades, the average is what you keep.</p>
+
+  <h2>Linearity: the most useful trick</h2>
+  <p>The expectation of a sum is the sum of the expectations:</p>
+  <p class="formula">E[X + Y] = E[X] + E[Y]</p>
+  <p>This holds <b>even when X and Y are dependent</b>, which is what makes it so powerful. To count something complicated, break it into simple pieces whose expectations you can find one at a time.</p>
+  <h3>Worked example: matching cards</h3>
+  <p>Shuffle ten numbered cards. How many end up in their original position, on average? The arrangements are hopelessly tangled, but linearity cuts through it. Let Iₖ be 1 if card k stays put and 0 otherwise. Card k stays put with probability 1/10, so E[Iₖ] = 1/10. The number of fixed cards is I₁ + … + I₁₀, so its expectation is 10 × 1/10 = 1. The cards affect each other, and it doesn't matter.</p>
+  <p>These 0/1 variables are called <b>indicators</b>. "Expected number of X" questions almost always yield to an indicator for each possible X.</p>
+
+  <h2>Waiting times: 1/p</h2>
+  <p>If each attempt succeeds with probability p, independently, the expected number of attempts until the first success is <b>1/p</b>. Rolling until a 6 takes 6 rolls on average. Flipping until heads takes 2.</p>
+  <p>Waits add up. Collecting all six faces of a die takes 6/6 + 6/5 + 6/4 + 6/3 + 6/2 + 6/1 = 14.7 rolls: each new face is its own geometric wait with a shrinking success probability.</p>
+
+  <h2>Conditioning on the first step</h2>
+  <p>For patterns like "two heads in a row", write an equation for the expected time from each state and solve. Let E₀ be the expected flips from scratch and E₁ the expected flips after one head:</p>
+  <p class="formula">E₀ = 1 + ½E₁ + ½E₀ &nbsp;&nbsp; E₁ = 1 + ½ · 0 + ½E₀</p>
+  <p>Solving gives E₀ = 6. The same method handles any finite pattern.</p>
+
+  <h2>Common traps</h2>
+  <ul>
+    <li><b>E[XY] ≠ E[X]E[Y] in general.</b> Products only split when X and Y are independent.</li>
+    <li><b>E[f(X)] ≠ f(E[X]).</b> The average of squares isn't the square of the average: E[X²] for a die is 91/6, not 3.5².</li>
+    <li><b>Optimal stopping isn't the average.</b> If you may reroll a die once, you should keep a 4 or more, so the game is worth 4.25, not 3.5.</li>
+  </ul>
+
+  <h2>Practice</h2>
+  <div class="embed-q" data-find="until a 6 appears. What is the expected number of rolls"></div>
+  <div class="embed-q" data-find="Ten cards are shuffled at random"></div>
+  <div class="embed-q" data-find="You may reroll once, but must keep the second roll"></div>
+  <div class="embed-q" data-find="two sixes in a row"></div>
+  <p class="lesson-next">Next: <a href="learn-conditional-probability.html">Conditional probability and Bayes</a> · <a href="probability-interview-questions.html">More probability questions</a></p>
+</article>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="learn.html">Learn</a>
+  <a href="quant-interview-questions.html">Interview questions</a>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js?v=202610111921"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="assets/auth.js?v=202610111921"></script>
+<script src="assets/site.js?v=202610111921"></script>
+<script src="assets/data.js?v=202610111921"></script>
+<script src="assets/generators.js?v=202610111921"></script>
+<script src="assets/embed.js?v=202610111921"></script>
+</body>
+</html>

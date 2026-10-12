@@ -9,7 +9,10 @@ canonical / og:url / absolute og:image tags on every page. Safe to run again wit
 import io, os, re, sys, datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PUBLIC = ["index.html", "app.html", "leaderboard.html", "about.html", "privacy.html", "terms.html", "login.html"]
+PUBLIC = ["index.html", "app.html", "quant-interview-questions.html", "probability-interview-questions.html", "brainteaser-interview-questions.html",
+          "options-interview-questions.html", "statistics-interview-questions.html", "python-coding-interview-questions.html", "mental-math-practice.html",
+          "learn.html", "learn-expected-value.html", "learn-conditional-probability.html", "learn-random-walks.html", "learn-options-greeks.html",
+          "learn-kelly.html", "learn-making-markets.html", "leaderboard.html", "about.html", "privacy.html", "terms.html", "login.html"]
 
 def main():
     if len(sys.argv) != 2:

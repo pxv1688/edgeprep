@@ -11,13 +11,18 @@
 
   function emit() { listeners.forEach(function (fn) { try { fn(A.user); } catch (e) {} }); }
   A.onChange = function (fn) { listeners.push(fn); if (A.ready) fn(A.user); };
-  A.name = function (u) { u = u || A.user; if (!u) return ""; return (u.user_metadata && u.user_metadata.display_name) || (u.email || "").split("@")[0]; };
+  A.name = function (u) { u = u || A.user; if (!u) return ""; var m = u.user_metadata || {}; return m.display_name || m.full_name || m.name || (u.email || "").split("@")[0]; };
 
   function need() { if (!ok) return Promise.reject(new Error("Accounts aren't available yet.")); return Promise.resolve(); }
   function unwrap(r) { if (r.error) throw r.error; return r.data; }
 
   A.signUp = function (email, password, displayName) { return need().then(function () { return sb.auth.signUp({email: email, password: password, options: {data: {display_name: displayName}, emailRedirectTo: base + "account.html"}}).then(unwrap); }); };
   A.signIn = function (email, password) { return need().then(function () { return sb.auth.signInWithPassword({email: email, password: password}).then(unwrap); }); };
+  /* one-click Google sign-in (enable the Google provider in Supabase first; see SETUP.md) */
+  A.signInWithGoogle = function () {
+    return need().then(function () { return sb.auth.signInWithOAuth({provider: "google", options: {redirectTo: base + "app.html#today"}}).then(unwrap); });
+  };
+  A.googleEnabled = !!cfg.googleSignIn;
   A.sendReset = function (email) { return need().then(function () { return sb.auth.resetPasswordForEmail(email, {redirectTo: base + "reset.html"}).then(unwrap); }); };
   A.updatePassword = function (password) { return need().then(function () { return sb.auth.updateUser({password: password}).then(unwrap); }); };
   A.signOut = function () { return need().then(function () { return sb.auth.signOut().then(unwrap); }); };

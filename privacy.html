@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Edge Privacy Policy</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="How Edge handles your data. No ads, no trackers, no cookies.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
-<link rel="stylesheet" href="assets/edge.css?v=202610111636">
+<link rel="stylesheet" href="assets/edge.css?v=202610111921">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
   <p class="sub" style="margin-top:10px">Last updated: October 10, 2026</p>
 
   <h2>The short version</h2>
-  <p>Edge has no ads, no analytics trackers and no cookies. You can practice without an account. If you create one, we store only what's needed to run it: your email, your profile and your practice progress.</p>
+  <p>Edge has no ads, no tracking cookies and no cross-site trackers. We count visits with a privacy-friendly tool that doesn't use cookies. You can practice without an account. If you create one, we store only what's needed to run it: your email, your profile and your practice progress.</p>
 
   <h2>Without an account</h2>
   <p>Edge saves your progress in your browser's local storage under the key <code>edge-v2</code>. That includes solved problems, daily results, the days you practiced, ratings, XP and best scores. It stays on your device and isn't sent to us.</p>
@@ -63,6 +63,12 @@
     <li>whether you want to appear on the leaderboard.</li>
   </ul>
   <p>We use this only to run your account, sync your progress and show the leaderboard. We don't sell it or share it for advertising. If you opt in, your display name, XP, solved count and streak appear on the public leaderboard. Your email never does.</p>
+
+  <h2>Signing in with Google</h2>
+  <p>If you choose "Continue with Google", Google shares your name, email address and profile picture link with us so we can create your account. We use your name as your starting display name, which you can change. We don't get your Google password or access to anything else in your Google account.</p>
+
+  <h2>Visitor statistics</h2>
+  <p>We use <a href="https://www.goatcounter.com" rel="noopener">GoatCounter</a> to count visits, so we know which pages and games people use. It doesn't use cookies or track you across sites. For each page view it records the page, the referring site, your browser, screen size and approximate country. GoatCounter says it doesn't store IP addresses and only keeps a short-lived hash to count unique visits. We can't identify you from these statistics, and we never combine them with your account.</p>
 
   <h2>Problem reports and feedback</h2>
   <p>If you report a problem or send feedback, we store what you wrote, the type of report, the problem it's about, the page you sent it from and the time. If you're signed in, it's linked to your account. If you add an email for a reply, we store that too. We use reports only to fix problems and improve Edge. They aren't public.</p>
@@ -85,6 +91,8 @@
   <h2>Service providers</h2>
   <ul>
     <li><b>Supabase</b> stores account data. See <a href="https://supabase.com/privacy" rel="noopener">Supabase's privacy policy</a>.</li>
+    <li><b>GoatCounter</b> provides cookie-free visitor statistics. See <a href="https://www.goatcounter.com/help/privacy" rel="noopener">GoatCounter's privacy policy</a>.</li>
+    <li><b>Google</b> handles sign-in if you choose "Continue with Google".</li>
     <li><b>Google Fonts</b> serves our typeface. Your browser's request reveals your IP address to Google, as described in <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy</a>.</li>
     <li><b>jsDelivr</b> serves the Supabase code library.</li>
     <li>Our <b>hosting provider</b> may keep standard server logs, such as IP addresses and request times.</li>
@@ -109,15 +117,17 @@
 ﻿</main>
 <footer>
   <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="learn.html">Learn</a>
+  <a href="quant-interview-questions.html">Interview questions</a>
   <a href="leaderboard.html">Leaderboard</a>
   <a href="about.html">About &amp; FAQ</a>
   <a href="privacy.html">Privacy</a>
   <a href="terms.html">Terms</a>
   <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
 </footer>
-<script src="assets/config.js?v=202610111636"></script>
+<script src="assets/config.js?v=202610111921"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
-<script src="assets/auth.js?v=202610111636"></script>
-<script src="assets/site.js?v=202610111636"></script>
+<script src="assets/auth.js?v=202610111921"></script>
+<script src="assets/site.js?v=202610111921"></script>
 </body>
 </html>

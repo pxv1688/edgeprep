@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Random walks and gambler's ruin | Edge lessons</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="Gambler's ruin and random walk interview questions solved with fair games: hitting probabilities and expected hitting times, with practice problems.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Random walks and gambler's ruin | Edge lessons">
+<meta property="og:description" content="Gambler's ruin and random walk interview questions solved with fair games: hitting probabilities and expected hitting times, with practice problems.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css?v=202610111921">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<article class="doc lesson">
+  <p class="sub"><a href="learn.html">Lessons</a> · Probability</p>
+  <h1>Random walks and gambler's ruin</h1>
+  <p class="lede" style="margin-top:12px">"You start with $a and bet $1 at a time until you hit $N or go broke." Questions like this look like they need long calculations. One idea, the fair game, solves most of them in a line.</p>
+
+  <h2>Fair games don't change your expected wealth</h2>
+  <p>In a fair bet, your expected wealth after the bet equals your wealth before it. A process with this property is called a <b>martingale</b>. The key fact, called <b>optional stopping</b>, is that (under mild conditions that hold for these bounded problems) stopping at a sensible time doesn't change the expectation either.</p>
+
+  <h3>Worked example: reaching a target</h3>
+  <p>You have $3, bet $1 on fair coin flips, and stop at $10 or $0. Let p be the chance of reaching $10. At the end you have $10 with probability p and $0 otherwise, so your expected final wealth is 10p. A fair game keeps it at $3:</p>
+  <p class="formula">10p = 3 &nbsp;⟹&nbsp; p = 3/10</p>
+  <p>In general, starting at a with targets 0 and N: <b>p = a/N</b>.</p>
+
+  <h3>The same idea for a symmetric walk</h3>
+  <p>A walk starts at 0 and moves ±1 with equal chances. What's the chance it reaches +b before −a? Its position is a martingale, so p · b − (1 − p) · a = 0, giving <b>p = a/(a + b)</b>. Reaching +2 before −1 has probability 1/3.</p>
+
+  <h2>How long does it take?</h2>
+  <p>For a ±1 walk, (position)² − (number of steps) is also a martingale. At the stopping time this gives E[steps] = E[final position²]. With barriers at −a and +b:</p>
+  <p class="formula">E[steps] = b² · a/(a+b) + a² · b/(a+b) = a · b</p>
+  <p>Hitting ±3 from 0 takes 9 steps on average.</p>
+
+  <h2>When the game isn't fair</h2>
+  <p>If each bet wins with probability p ≠ ½, let r = q/p where q = 1 − p. Then r^(wealth) is the martingale, and the chance of reaching N from a is</p>
+  <p class="formula">P = (rᵃ − 1) / (rᴺ − 1)</p>
+  <p>A small edge compounds dramatically over many bets, which is the mathematical reason casinos win.</p>
+
+  <h2>Common traps</h2>
+  <ul>
+    <li><b>Infinite games.</b> Optional stopping needs the game to end in a sensible way. "Double your bet after every loss" seems to guarantee profit, but it needs unlimited money and time.</li>
+    <li><b>Using a/N for unfair games.</b> That formula only holds when every bet is fair.</li>
+  </ul>
+
+  <h2>Practice</h2>
+  <div class="embed-q" data-find="You have $3 and bet $1 on fair coin flips"></div>
+  <div class="embed-q" data-find="reaches +2 before −1"></div>
+  <div class="embed-q" data-find="until it first hits +3 or −3"></div>
+  <div class="embed-q" data-find="Two players take turns flipping a fair coin"></div>
+  <p class="lesson-next">Next: <a href="learn-options-greeks.html">Options and the Greeks</a> · <a href="learn-conditional-probability.html">Previous: Bayes</a></p>
+</article>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="learn.html">Learn</a>
+  <a href="quant-interview-questions.html">Interview questions</a>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js?v=202610111921"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="assets/auth.js?v=202610111921"></script>
+<script src="assets/site.js?v=202610111921"></script>
+<script src="assets/data.js?v=202610111921"></script>
+<script src="assets/generators.js?v=202610111921"></script>
+<script src="assets/embed.js?v=202610111921"></script>
+</body>
+</html>

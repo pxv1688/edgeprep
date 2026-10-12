@@ -1,9 +1,9 @@
 /* Edge service worker: makes the site installable and usable offline.
    Network first, so a deploy shows up on the next load; the cache is only the offline fallback. */
-var CACHE = "edge-v2";
+var CACHE = "edge-v3";
 var CORE = [
   "./", "index.html", "app.html", "about.html", "leaderboard.html", "login.html", "privacy.html", "terms.html", "404.html",
-  "assets/edge.css", "assets/data.js", "assets/generators.js", "assets/app.js", "assets/config.js", "assets/auth.js", "assets/site.js", "assets/landing.js",
+  "assets/edge.css", "assets/data.js", "assets/generators.js", "assets/app.js", "assets/config.js", "assets/auth.js", "assets/site.js", "assets/landing.js", "assets/embed.js", "learn.html",
   "favicon.svg", "manifest.webmanifest", "assets/img/icon-192.png", "assets/img/icon-512.png"
 ];
 

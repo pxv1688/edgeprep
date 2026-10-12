@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Options and the Greeks | Edge lessons</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="Option payoffs, put-call parity, one-step pricing, delta, gamma, vega, theta and the 0.4 S sigma root T approximation for trading interviews.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E3FA8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Edge">
+<meta property="og:title" content="Options and the Greeks | Edge lessons">
+<meta property="og:description" content="Option payoffs, put-call parity, one-step pricing, delta, gamma, vega, theta and the 0.4 S sigma root T approximation for trading interviews.">
+<meta property="og:image" content="assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- site-url -->
+<script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<link rel="stylesheet" href="assets/edge.css?v=202610111921">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="mark" href="index.html" aria-label="Edge home"><i aria-hidden="true"><b></b><b class="y"></b><b></b><b class="o"></b><b></b><b class="y"></b><b></b><b></b><b class="o"></b></i>Edge</a>
+    <nav class="nav" aria-label="Main">
+      <a href="app.html#today">Today</a>
+      <a href="app.html#train">Train</a>
+      <a href="app.html#bank">Problem Bank</a>
+      <a href="app.html#games">Games</a>
+      <a href="app.html#stats">Stats</a>
+      <a href="app.html#profile">Profile</a>
+    </nav>
+    <a class="acct" id="acct" href="login.html">Sign in</a>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<article class="doc lesson">
+  <p class="sub"><a href="learn.html">Lessons</a> · Options</p>
+  <h1>Options and the Greeks</h1>
+  <p class="lede" style="margin-top:12px">Options questions in trading interviews are less about formulas and more about intuition: what a position pays, how its value moves, and quick estimates you can do in your head.</p>
+
+  <h2>Payoffs first</h2>
+  <p>A <b>call</b> with strike K pays max(S − K, 0) at expiry; a <b>put</b> pays max(K − S, 0). Almost every strategy is a combination of these. A <b>straddle</b> (call + put at the same strike) pays |S − K|, so it profits from big moves either way. A <b>call spread</b> (long a lower strike, short a higher one) caps both the cost and the payoff.</p>
+
+  <h2>Put–call parity</h2>
+  <p>A long call plus a short put at the same strike pays S − K in every outcome, exactly like owning the stock and owing K. Positions with identical payoffs must cost the same, so</p>
+  <p class="formula">C − P = S − K·e^(−rT)</p>
+  <p>With zero rates, C − P = S − K. If a quoted call and put break this, there's an arbitrage.</p>
+
+  <h2>Pricing with a one-step tree</h2>
+  <p>A $100 stock will be $120 or $90 next period, and rates are zero. Price a $100 call. Find the probability q that makes the stock a fair bet: 120q + 90(1 − q) = 100, so q = 1/3. The call pays $20 in the up state, so it's worth 20 × 1/3 ≈ $6.67. You can replicate it by holding ⅔ of a share, which is the option's <b>delta</b>: (20 − 0)/(120 − 90). This no-arbitrage idea is the heart of Black–Scholes.</p>
+
+  <h2>The Greeks</h2>
+  <ul>
+    <li><b>Delta</b>: how much the option price moves per $1 in the stock. Calls range from 0 to 1, puts from −1 to 0. An at-the-money option has delta near 0.5 (−0.5 for a put).</li>
+    <li><b>Gamma</b>: how fast delta changes. It's largest at the money near expiry, where delta can flip from 0 to 1 over a small move. Long options are long gamma.</li>
+    <li><b>Vega</b>: sensitivity to implied volatility. Largest for long-dated at-the-money options.</li>
+    <li><b>Theta</b>: time decay. Long options lose value as time passes, all else equal.</li>
+  </ul>
+  <p>A delta-hedged long option makes about <b>½ · Γ · (ΔS)²</b> on a move and pays theta for the privilege. That's the core trade-off of options market making.</p>
+
+  <h2>The mental-math price</h2>
+  <p>For an at-the-money option with low rates:</p>
+  <p class="formula">ATM call ≈ 0.4 × S × σ × √T</p>
+  <p>The 0.4 is 1/√(2π) ≈ 0.399. A 1-year ATM call on a $100 stock with 20% volatility is about 0.4 × 100 × 0.2 = $8 (exactly $7.97). The price is roughly linear in volatility, so doubling vol roughly doubles the price.</p>
+
+  <h2>Common traps</h2>
+  <ul>
+    <li><b>Early exercise.</b> An American call on a stock with no dividends should never be exercised early. It's worth more alive.</li>
+    <li><b>Mixing up gamma and vega.</b> Gamma is about the stock moving; vega is about implied volatility changing.</li>
+  </ul>
+
+  <h2>Practice</h2>
+  <div class="embed-q" data-find="Roughly what is the delta of an at-the-money call"></div>
+  <div class="embed-q" data-find="Which is put–call parity"></div>
+  <div class="embed-q" data-find="$100 will be $120 or $90 in one period"></div>
+  <div class="embed-q" data-find="Which Greek spikes for an at-the-money option"></div>
+  <p class="lesson-next">Next: <a href="learn-kelly.html">The Kelly criterion</a> · <a href="options-interview-questions.html">More options questions</a></p>
+</article>
+﻿</main>
+<footer>
+  <span>Edge. Practice for quant interviews. Not affiliated with any firm.</span>
+  <a href="learn.html">Learn</a>
+  <a href="quant-interview-questions.html">Interview questions</a>
+  <a href="leaderboard.html">Leaderboard</a>
+  <a href="about.html">About &amp; FAQ</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+</footer>
+<script src="assets/config.js?v=202610111921"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="assets/auth.js?v=202610111921"></script>
+<script src="assets/site.js?v=202610111921"></script>
+<script src="assets/data.js?v=202610111921"></script>
+<script src="assets/generators.js?v=202610111921"></script>
+<script src="assets/embed.js?v=202610111921"></script>
+</body>
+</html>

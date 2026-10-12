@@ -840,6 +840,7 @@
     app.innerHTML = '<div class="stack"><h1>Train</h1><p class="lede">Structured practice: review what you missed, follow a study track, or drill at your level.</p></div>' + planSection(true) +
       '<section class="stack" aria-labelledby="tt"><div class="row between"><h2 id="tt">Study tracks</h2><a class="sub" href="#tracks">All tracks</a></div>' + trackList() + "</section>" +
       '<section class="stack" aria-labelledby="ts"><h2 id="ts">More ways to train</h2><div class="plans">' +
+        '<a class="plan" href="learn.html"><span class="n">6</span><span><h3>Lessons</h3><p>Expected value, Bayes, random walks, Greeks, Kelly and market making, with practice built in.</p></span></a>' +
         '<a class="plan" href="#saved"><span class="n">' + Object.keys(S.saved || {}).length + '</span><span><h3>Saved problems</h3><p>Problems you bookmarked, with your notes.</p></span></a>' +
         '<a class="plan" href="#mock"><span class="n">' + (S.mocks && S.mocks.length ? Math.max.apply(null, S.mocks.map(function (m) { return Math.round(100 * m.score / m.total); })) + "%" : "–") + '</span><span><h3>Mock assessment</h3><p>20 questions, 20 minutes, no feedback until the end.</p></span></a>' +
       "</div></section>" +
@@ -1130,6 +1131,7 @@
     var navId = ["math", "market", "bet", "quiz", "rush", "mock"].indexOf(id) >= 0 ? "games" : ["practice", "review", "tracks", "track", "archive"].indexOf(id) >= 0 ? "train" : id;
     $$(".nav a").forEach(function (a) { if (a.getAttribute("href") === "#" + navId) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     var app = clearApp(); V[id](app, arg); scrollTo(0, 0);
+    if (window.EdgeTrack) window.EdgeTrack("/app/" + id + (arg ? "/" + arg : ""), "App: " + id);
   }
   addEventListener("hashchange", route);
   hud(); route();
