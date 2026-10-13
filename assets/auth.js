@@ -20,7 +20,7 @@
   A.signIn = function (email, password) { return need().then(function () { return sb.auth.signInWithPassword({email: email, password: password}).then(unwrap); }); };
   /* one-click Google sign-in (enable the Google provider in Supabase first; see SETUP.md) */
   A.signInWithGoogle = function () {
-    return need().then(function () { return sb.auth.signInWithOAuth({provider: "google", options: {redirectTo: base + "app.html#today"}}).then(unwrap); });
+    return need().then(function () { return sb.auth.signInWithOAuth({provider: "google", options: {redirectTo: base + "app.html"}}).then(unwrap); });
   };
   A.googleEnabled = !!cfg.googleSignIn;
   A.sendReset = function (email) { return need().then(function () { return sb.auth.resetPasswordForEmail(email, {redirectTo: base + "reset.html"}).then(unwrap); }); };
