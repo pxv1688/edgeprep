@@ -12,5 +12,5 @@ window.EDGE_CONFIG = {
   supabaseUrl: "https://qabnryplxriirciusydx.supabase.co",
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhYm5yeXBseHJpaXJjaXVzeWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NDQ1ODYsImV4cCI6MjEwNzQyMDU4Nn0.bwcFpEP1MtvK3YgNpo2HGUb-DYxZIy-DGeyu3bXP8iw",
   googleSignIn: false,
-  goatcounter: ""
+  goatcounter: "edgeprep"
 };
