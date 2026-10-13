@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /account.html
 Disallow: /reset.html
+Sitemap: https://lighthearted-squirrel-da6cdd.netlify.app/sitemap.xml
