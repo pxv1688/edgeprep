@@ -139,3 +139,11 @@ begin
 end $$;
 revoke all on function public.delete_me() from public, anon;
 grant execute on function public.delete_me() to authenticated;
+
+-- Explicit table permissions for the website's API roles (row level security above still
+-- limits each user to their own rows; newer Supabase projects don't grant these by default)
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.profiles to authenticated;
+grant select, insert, update on public.progress to authenticated;
+grant insert on public.feedback to anon, authenticated;
+grant insert on public.subscribers to anon, authenticated;
