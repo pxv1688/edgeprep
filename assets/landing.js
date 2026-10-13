@@ -20,14 +20,17 @@
   var total = ALL.length.toLocaleString();
   document.querySelectorAll('[data-count="all"]').forEach(function (el) { el.textContent = total; });
 
-  /* ---------- accounts: signed-in visitors go to the app; guests with progress get "continue" ---------- */
+  /* ---------- accounts: signed-in visitors get "Open the app"; guests with progress get "continue" ---------- */
   var A = window.EdgeAuth;
-  if (A) A.onChange(function (u) { if (u) location.replace("app.html#today"); });
   try { var st = JSON.parse(localStorage.getItem("edge-v2") || "null"); if (st && st.solved && Object.keys(st.solved).length) $("#ctaGuest").textContent = "Continue practicing"; } catch (e) {}
   if (A && !A.configured) {
     ["#ctaMain", "#ctaEnd"].forEach(function (s) { var b = $(s); b.textContent = "Start practicing"; b.href = "app.html#today"; if (b.nextElementSibling) b.nextElementSibling.hidden = true; });
     $("#ctaGuest").hidden = true;
   }
+  if (A && A.configured) A.onChange(function (u) {
+    if (!u) return;
+    ["#ctaMain", "#ctaEnd"].forEach(function (s) { var b = $(s); b.textContent = "Open the app"; b.href = "app.html#today"; if (b.nextElementSibling) b.nextElementSibling.hidden = true; });
+  });
 
   /* ---------- the headline board ---------- */
   var WORDS = ["QUANT", "INTERVIEWS", "ONE", "SQUARE", "A", "DAY"], lastCols = 0, target = null;

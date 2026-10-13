@@ -1022,7 +1022,11 @@
         problemWidget($("#obP"), picks[i], {next: function () { step++; render(); }, onDone: function (ok, tries) { if (ok && tries <= 1) right++; }});
       }
     }
-    app.addEventListener("click", function (e) { if (e.target.id === "obSkip") { S.onboarded = true; save(); } });
+    app.addEventListener("click", function (e) {
+      if (e.target.id !== "obSkip") return;
+      e.preventDefault(); S.onboarded = true; save();
+      if (location.hash === "#today") route(); else location.hash = "#today"; /* same hash fires no hashchange */
+    });
     render();
   };
 
