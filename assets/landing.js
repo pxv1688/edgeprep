@@ -1,4 +1,4 @@
-/* Edge landing page: the headline board, 1 Across with a 30-second clock, the topic sampler and email signup. */
+/* Edge landing page: the headline board, 1 Across with a 30-second clock, worked-solution samples and the weekly recap signup. */
 (function () {
   "use strict";
   var CL = window.EDGE_BANK, ALL = CL.concat(window.EDGE_GENERATED || []), SETS = window.EDGE_SETS;
@@ -142,34 +142,19 @@
       return '<button role="tab" id="tab-' + s.id + '" aria-selected="' + (s.id === curSet) + '" data-set="' + s.id + '">' + s.name + ' <span class="tab-n">' + n.toLocaleString() + "</span></button>";
     }).join("");
   }
+  /* shows one problem fully worked: the method is the product, so it's open by default */
   function drawSample() {
     var list = ALL.filter(function (p) { return p.set === curSet; });
-    sample = list[Math.floor(Math.random() * list.length)];
-    var p = sample, panel = $("#tPanel");
+    var walked = list.filter(function (p) { return p.steps && p.steps.length; });
+    var from = walked.length >= 3 && Math.random() < 0.75 ? walked : list;
+    var p = sample = from[Math.floor(Math.random() * from.length)], panel = $("#tPanel");
+    var mix = [1, 2, 3].map(function (d) { return '<span><i class="dm d' + d + '"></i>' + diffName(d) + " " + list.filter(function (q) { return q.diff === d; }).length.toLocaleString() + "</span>"; }).join("");
     panel.setAttribute("aria-labelledby", "tab-" + curSet);
-    panel.innerHTML = '<p class="meta"><span>' + esc(p.topic && p.topic !== "Classic" ? p.topic : setName(p.set)) + "</span><span>" + diffName(p.diff) + '</span></p><p class="today-q">' + esc(p.q) + "</p>" +
-      (p.type === "num"
-        ? '<div class="row"><label class="sr" for="sA">Your answer</label><input class="field" id="sA" autocomplete="off" inputmode="decimal" placeholder="Your answer"><button class="btn go" id="sGo">Check</button></div>'
-        : '<div class="opts">' + p.opts.map(function (o, i) { return '<button class="opt" data-i="' + i + '"><span class="k">' + "ABCD"[i] + "</span>" + esc(o) + "</button>"; }).join("") + "</div>") +
-      '<p class="fb" id="sFb" aria-live="polite"></p><div class="ex" id="sEx" hidden></div><div class="row"><button class="btn alt" id="sShow">Show the method</button><button class="btn alt" id="sNext">Another ' + setName(curSet).toLowerCase() + " problem</button></div>";
-    function reveal(ok, msg) {
-      $("#sFb").className = "fb " + (ok ? "good" : ok === false ? "bad" : ""); $("#sFb").textContent = msg || "";
-      $("#sEx").hidden = false; $("#sEx").innerHTML = exHTML(p); $("#sShow").disabled = true;
-      panel.querySelectorAll("input,.opt,#sGo").forEach(function (b) { b.disabled = true; });
-    }
-    if (p.type === "num") {
-      $("#sGo").onclick = function () { var v = parse($("#sA").value); if (isNaN(v)) return; if (close(v, p)) reveal(true, "Correct."); else { $("#sFb").className = "fb bad"; $("#sFb").textContent = "Not quite. Try again or show the method."; } };
-      $("#sA").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#sGo").click(); });
-    } else {
-      panel.querySelector(".opts").onclick = function (e) {
-        var b = e.target.closest(".opt"); if (!b || b.disabled) return;
-        var ok = +b.dataset.i === p.a;
-        panel.querySelectorAll(".opt").forEach(function (o, j) { if (j === p.a) o.classList.add("right"); });
-        if (!ok) b.classList.add("wrong");
-        reveal(ok, ok ? "Correct." : "Not this one.");
-      };
-    }
-    $("#sShow").onclick = function () { reveal(null, ""); };
+    panel.innerHTML = '<div class="row between"><p class="meta"><span>' + esc(p.topic && p.topic !== "Classic" ? p.topic : setName(p.set)) + '</span><span><i class="dm d' + p.diff + '"></i>' + diffName(p.diff) + '</span></p><p class="mix" aria-label="Problems in this topic by difficulty">' + mix + "</p></div>" +
+      '<p class="today-q">' + esc(p.q) + "</p>" +
+      (p.type === "mc" ? '<ol class="mc-list">' + p.opts.map(function (o, i) { return "<li" + (i === p.a ? ' class="right"' : "") + '><span class="k">' + "ABCD"[i] + "</span>" + esc(o) + "</li>"; }).join("") + "</ol>" : "") +
+      '<div class="worked"><span class="worked-tag">The method</span>' + exHTML(p).replace('<details class="walk">', '<details class="walk" open>') + "</div>" +
+      '<div class="row"><button class="btn alt" id="sNext">Another ' + setName(curSet).toLowerCase() + ' problem</button><a class="btn" href="app.html#bank">Practice ' + setName(curSet).toLowerCase() + " in the app</a></div>";
     $("#sNext").onclick = drawSample;
   }
   $("#tTabs").addEventListener("click", function (e) { var b = e.target.closest("[data-set]"); if (!b) return; curSet = b.dataset.set; tabs(); drawSample(); $("#tab-" + curSet).focus(); });
@@ -179,12 +164,9 @@
     curSet = SETS[(i + SETS.length) % SETS.length].id; tabs(); drawSample(); $("#tab-" + curSet).focus(); e.preventDefault();
   });
 
-  /* ---------- mini bank illustration ---------- */
-  var mb = ""; for (var k = 1; k <= 40; k++) mb += '<span class="cell' + ([2, 3, 7, 11, 12, 13, 18, 22, 29, 31].indexOf(k) >= 0 ? " solved" : "") + '"><sup>' + k + "</sup></span>"; $("#miniBank").innerHTML = mb;
-
-  /* ---------- weekly puzzle email ---------- */
+  /* ---------- weekly recap email ---------- */
   if (A && A.configured && A.subscribe) {
-    var form = $("#subForm"); form.hidden = false;
+    var form = $("#subForm"); $("#recap").hidden = false;
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var em = $("#subEmail").value.trim(), fb = $("#subFb");
@@ -192,7 +174,7 @@
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { fb.className = "fb bad"; fb.textContent = "Enter a valid email address."; return; }
       form.querySelector("button").disabled = true; fb.className = "fb"; fb.textContent = "Subscribing…";
       A.subscribe(em, "landing").then(function (r) {
-        fb.className = "fb good"; fb.textContent = r === "exists" ? "You're already subscribed." : "You're on the list. The first puzzle arrives next week.";
+        fb.className = "fb good"; fb.textContent = r === "exists" ? "You're already subscribed." : "You're on the list. Your first recap arrives Sunday.";
       }, function () { form.querySelector("button").disabled = false; fb.className = "fb bad"; fb.textContent = "Couldn't subscribe right now. Try again in a minute."; });
     });
   }
