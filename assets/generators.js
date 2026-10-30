@@ -15,6 +15,8 @@
   function fact(n) { var r = 1; for (var i = 2; i <= n; i++) r *= i; return r; }
   function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a; }
   function lcm(a, b) { return a / gcd(a, b) * b; }
+  /* "1 head", "2 heads": keeps generated sentences grammatical */
+  function pl(n, one, many) { return n + " " + (n === 1 ? one : (many || one + "s")); }
   function fr(n, d) { var g = gcd(n, d); return (n / g) + "/" + (d / g); }
   function r4(x) { return String(+x.toPrecision(4)); }
   function H(n) { var s = 0; for (var i = 1; i <= n; i++) s += 1 / i; return s; }
@@ -40,11 +42,11 @@
       "Count the ordered pairs that work.", c + " of the " + (n * n) + " ordered outcomes sum to " + s + ": " + fr(c, n * n) + "."); } });
 
   for (var n = 2; n <= 16; n++) for (var k = 0; k <= n; k++) add("binfair", "Coin flips", "prob", n > 8 ? 2 : 1,
-    "You flip a fair coin " + n + " times. What is the probability of exactly " + k + " heads?", C(n, k) / Math.pow(2, n),
+    "You flip a fair coin " + n + " times. What is the probability of exactly " + pl(k, "head") + "?", C(n, k) / Math.pow(2, n),
     "Count arrangements, then divide by 2^" + n + ".", "C(" + n + "," + k + ") / 2^" + n + " = " + C(n, k) + "/" + Math.pow(2, n) + " = " + fr(C(n, k), Math.pow(2, n)) + ".");
 
   [0.3, 0.4, 0.6, 0.7].forEach(function (p) { for (var n = 3; n <= 8; n++) for (var k = 0; k <= n; k++) { var v = C(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
-    add("binbias", "Coin flips", "prob", 2, "A coin lands heads with probability " + p + ". You flip it " + n + " times. What is the probability of exactly " + k + " heads? (Decimal.)", v,
+    add("binbias", "Coin flips", "prob", 2, "A coin lands heads with probability " + p + ". You flip it " + n + " times. What is the probability of exactly " + pl(k, "head") + "? (Decimal.)", v,
       "Binomial: C(n,k) p^k (1−p)^(n−k).", "C(" + n + "," + k + ") × " + p + "^" + k + " × " + r4(1 - p) + "^" + (n - k) + " ≈ " + r4(v) + "."); } });
 
   for (var r = 1; r <= 8; r++) for (var b = 1; b <= 8; b++) { if (r + b < 3) continue; var tot = C(r + b, 2);
@@ -119,7 +121,7 @@
   }
 
   [0.5, 1, 2, 3, 4, 5].forEach(function (L) { for (var k = 0; k <= 6; k++) { var v = Math.exp(-L) * Math.pow(L, k) / fact(k);
-    add("poisson", "Poisson", "prob", 2, "Events arrive as a Poisson process averaging " + L + " per hour. What is the probability of exactly " + k + " events in an hour? (Decimal.)", v,
+    add("poisson", "Poisson", "prob", 2, "Events arrive as a Poisson process averaging " + L + " per hour. What is the probability of exactly " + pl(k, "event") + " in an hour? (Decimal.)", v,
       "P(N = k) = e^(−λ) λ^k / k!.", "e^(−" + L + ") × " + L + "^" + k + " / " + k + "! ≈ " + r4(v) + ".", {abs: 0.0005}); } });
 
   for (k = 2; k <= 6; k++) add("suit", "Cards", "prob", 2, "You draw " + k + " cards from a shuffled 52-card deck. What is the probability they are all the same suit? (Decimal.)", 4 * C(13, k) / C(52, k),
@@ -133,7 +135,7 @@
     add("expmin", "Exponentials", "prob", 2, "You have " + k + " independent Exponential(1) waiting times. What is the expected value of the shortest?", 1 / k, "The min of exponentials is exponential.", "min ~ Exponential(" + k + "), mean 1/" + k + ".");
     add("expmax", "Exponentials", "prob", 3, "You have " + k + " independent Exponential(1) waiting times. What is the expected value of the longest? (Decimal.)", H(k), "After each arrival, the rest restart by memorylessness.", "1/" + k + " + 1/" + (k - 1) + " + … + 1 = H(" + k + ") ≈ " + r4(H(k)) + ".", {steps: [
       "The first of " + k + " Exponential(1) clocks rings after an Exponential(" + k + ") time, which averages 1/" + k + ".",
-      "Memorylessness: the " + (k - 1) + " clocks still running start fresh, so the next gap averages 1/" + (k - 1) + ".",
+      "Memorylessness: the " + (k === 2 ? "1 clock still running starts" : (k - 1) + " clocks still running start") + " fresh, so the next gap averages 1/" + (k - 1) + ".",
       "Keep going until the last clock rings: 1/" + k + " + 1/" + (k - 1) + " + … + 1/1.",
       "That's the harmonic number H(" + k + ") ≈ " + r4(H(k)) + "."]});
   }
@@ -238,7 +240,7 @@
     add("pyfloor", "Python arithmetic", "code", x < 0 || y < 0 ? 2 : 1, "Python: what does print(" + x + " // " + y + ") show?", q, "// floors toward negative infinity.", x + " / " + y + " = " + r4(x / y) + ", floored to " + q + ".", {exact: true});
     add("pymod", "Python arithmetic", "code", x < 0 || y < 0 ? 2 : 1, "Python: what does print(" + x + " % " + y + ") show?", md, "In Python, a % b takes the sign of b.", x + " − (" + y + ") × (" + q + ") = " + md + ".", {exact: true}); }); });
   [[0, 10, 1], [0, 10, 2], [0, 10, 3], [1, 20, 3], [5, 50, 5], [10, 0, -1], [10, 0, -3], [3, 3, 1], [0, 100, 7], [2, 30, 4], [-5, 5, 2], [100, 1, -9], [1, 1000, 10], [0, 7, 7], [7, 0, 2]].forEach(function (t) { var len = Math.max(0, Math.ceil((t[1] - t[0]) / t[2]));
-    add("pyrange", "Python ranges", "code", 1, "Python: what does print(len(range(" + t.join(", ") + "))) show?", len, "range stops before the end value.", "The sequence starts at " + t[0] + ", steps by " + t[2] + " and stops before " + t[1] + ": " + len + " values.", {exact: true}); });
+    add("pyrange", "Python ranges", "code", 1, "Python: what does print(len(range(" + t.join(", ") + "))) show?", len, "range stops before the end value.", "The sequence starts at " + t[0] + ", steps by " + t[2] + " and stops before " + t[1] + ": " + pl(len, "value") + ".", {exact: true}); });
   for (n = 10; n <= 255; n += 5) { var ones = n.toString(2).split("").filter(function (c) { return c === "1"; }).length;
     add("popcount", "Bits", "code", 2, "Python: what does print(bin(" + n + ").count('1')) show?", ones, "Write " + n + " in binary.", n + " = 0b" + n.toString(2) + ", which has " + ones + " ones.", {exact: true}); }
   for (k = 1; k <= 20; k++) add("pyshift", "Bits", "code", 1, "Python: what does print(1 << " + k + ") show?", Math.pow(2, k), "A left shift multiplies by 2.", "1 << " + k + " = 2^" + k + " = " + Math.pow(2, k).toLocaleString() + ".", {exact: true});
@@ -364,25 +366,25 @@
       return "Anchor on values worth memorizing: P(Z > 1) ≈ 0.159, P(Z > 1.645) ≈ 0.05, P(Z > 1.96) ≈ 0.025, P(Z > 2) ≈ 0.023, P(Z > 3) ≈ 0.0013. For z = " + z + ": 1 − Φ(" + z + ") ≈ " + r4(1 - Ncdf(z)) + "."; },
     ntail: function (q) { var m = q.match(/SD (\d+)\. What is P\(X > (\d+)\)/); if (!m) return; var s = +m[1], x = +m[2], z = (x - 100) / s, v = 1 - Ncdf(z);
       return "Standardize: z = (" + x + " − 100)/" + s + " = " + fx(z) + ". " + (z < 0 ? "Below the mean, so P(X > " + x + ") = 1 − P(Z > " + fx(-z) + ") ≈ " + r4(v) + "." : "P(X > " + x + ") = P(Z > " + fx(z) + ") ≈ " + r4(v) + ". (68–95–99.7 rule: about 16% lies above 1 SD, 2.5% above 2 SD.)"); },
-    pyshift: function (q) { var k = nums(q.replace("1 <<", ""))[0]; return "<< shifts the bits left; each shift doubles the number. Starting from 1 and shifting " + k + " times gives 2^" + k + " = " + Math.pow(2, k).toLocaleString() + "."; },
+    pyshift: function (q) { var k = nums(q.replace("1 <<", ""))[0]; return "<< shifts the bits left; each shift doubles the number. Starting from 1 and shifting " + pl(k, "time") + " gives 2^" + k + " = " + Math.pow(2, k).toLocaleString() + "."; },
     odds: function (q) { var n = nums(q)[0]; return "Try small cases: 1 = 1², 1 + 3 = 2², 1 + 3 + 5 = 3². Each new odd number turns a k × k square into a (k+1) × (k+1) square, so the first " + n + " odd numbers sum to " + n + "² = " + (n * n) + "."; },
     atleast: function (q) { var m = q.match(/(\d+) times\. What is the probability that a (\d+) appears/); if (!m) return; var k = +m[1], n = +m[2], miss = Math.pow((n - 1) / n, k);
       return "It's easier to find the chance it never appears. Each roll misses with probability " + (n - 1) + "/" + n + ", and the rolls are independent, so P(never) = (" + (n - 1) + "/" + n + ")^" + k + " ≈ " + r4(miss) + ". So P(at least once) = 1 − " + r4(miss) + " ≈ " + r4(1 - miss) + "."; },
-    binfair: function (q) { var m = q.match(/fair coin (\d+) times\. What is the probability of exactly (\d+) heads/); if (!m) return; var n = +m[1], k = +m[2], c = C(n, k), t = Math.pow(2, n);
-      return "All 2^" + n + " = " + t + " sequences of flips are equally likely. Choosing which " + k + " flips are heads gives C(" + n + "," + k + ") = " + c + " of them. So the probability is " + c + "/" + t + (fr(c, t) !== c + "/" + t ? " = " + fr(c, t) : "") + "."; },
-    binbias: function (q) { var m = q.match(/probability ([\d.]+)\. You flip it (\d+) times\. What is the probability of exactly (\d+) heads/); if (!m) return; var p = +m[1], n = +m[2], k = +m[3], one = Math.pow(p, k) * Math.pow(1 - p, n - k);
-      return "Any one sequence with " + k + " heads and " + (n - k) + " tails has probability " + p + "^" + k + " × " + fx(1 - p) + "^" + (n - k) + " ≈ " + r4(one) + ". There are C(" + n + "," + k + ") = " + C(n, k) + " such sequences, so the total is " + C(n, k) + " × " + r4(one) + " ≈ " + r4(C(n, k) * one) + "."; },
+    binfair: function (q) { var m = q.match(/fair coin (\d+) times\. What is the probability of exactly (\d+) heads?/); if (!m) return; var n = +m[1], k = +m[2], c = C(n, k), t = Math.pow(2, n);
+      return "All 2^" + n + " = " + t + " sequences of flips are equally likely. Choosing which " + (k === 1 ? "flip is" : k + " flips are") + " heads gives C(" + n + "," + k + ") = " + c + " of them. So the probability is " + c + "/" + t + (fr(c, t) !== c + "/" + t ? " = " + fr(c, t) : "") + "."; },
+    binbias: function (q) { var m = q.match(/probability ([\d.]+)\. You flip it (\d+) times\. What is the probability of exactly (\d+) heads?/); if (!m) return; var p = +m[1], n = +m[2], k = +m[3], one = Math.pow(p, k) * Math.pow(1 - p, n - k);
+      return "Any one sequence with " + pl(k, "head") + " and " + pl(n - k, "tail") + " has probability " + p + "^" + k + " × " + fx(1 - p) + "^" + (n - k) + " ≈ " + r4(one) + ". There are C(" + n + "," + k + ") = " + C(n, k) + " such sequences, so the total is " + C(n, k) + " × " + r4(one) + " ≈ " + r4(C(n, k) * one) + "."; },
     bagsame: function (q) { var m = q.match(/holds (\d+) red and (\d+) blue/); if (!m) return; var r = +m[1], b = +m[2], T = C(r + b, 2), x = C(r, 2), y = C(b, 2);
-      return "There are C(" + (r + b) + ",2) = " + T + " equally likely pairs. Same color means both red (C(" + r + ",2) = " + x + " pairs) or both blue (C(" + b + ",2) = " + y + " pairs): (" + x + " + " + y + ")/" + T + " = " + fr(x + y, T) + "."; },
+      return "There are C(" + (r + b) + ",2) = " + T + " equally likely pairs. Same color means both red (C(" + r + ",2) = " + pl(x, "pair") + ") or both blue (C(" + b + ",2) = " + pl(y, "pair") + "): (" + x + " + " + y + ")/" + T + " = " + fr(x + y, T) + "."; },
     bagred: function (q) { var m = q.match(/holds (\d+) red and (\d+) blue/); if (!m) return; var r = +m[1], b = +m[2];
-      return "The first ball is red with probability " + r + "/" + (r + b) + ". After that, " + (r - 1) + " reds remain among " + (r + b - 1) + " balls, so the second is red with probability " + (r - 1) + "/" + (r + b - 1) + ". Multiply: " + fr(r * (r - 1), (r + b) * (r + b - 1)) + "."; },
+      return "The first ball is red with probability " + r + "/" + (r + b) + ". After that, " + (r === 2 ? "1 red remains" : (r - 1) + " reds remain") + " among " + (r + b - 1) + " balls, so the second is red with probability " + (r - 1) + "/" + (r + b - 1) + ". Multiply: " + fr(r * (r - 1), (r + b) * (r + b - 1)) + "."; },
     distinct: function (q) { var m = q.match(/fair (?:(\d+)-sided|six-sided) die (\d+) times/); if (!m) return; var n = m[1] ? +m[1] : 6, k = +m[2], hit = 1 - Math.pow((n - 1) / n, k);
       return "Use linearity: take the faces one at a time. A given face is missed by all " + k + " rolls with probability (" + (n - 1) + "/" + n + ")^" + k + ", so it shows up with probability " + r4(hit) + ". Add that up over " + n + " faces: " + n + " × " + r4(hit) + " ≈ " + r4(n * hit) + "."; },
     ace: function (q) { var k = nums(q)[0], none = C(48, k) / C(52, k);
       return "Use the complement. No aces means all " + k + " card" + (k > 1 ? "s come" : " comes") + " from the 48 non-aces: C(48," + k + ")/C(52," + k + ") ≈ " + r4(none) + ". So P(at least one ace) = 1 − " + r4(none) + " ≈ " + r4(1 - none) + "."; },
     suit: function (q) { var k = nums(q)[0];
       return "Choose the suit (4 ways), then " + k + " of its 13 cards: 4 × C(13," + k + ") = " + (4 * C(13, k)).toLocaleString() + " hands. All hands: C(52," + k + ") = " + C(52, k).toLocaleString() + ". Divide: ≈ " + r4(4 * C(13, k) / C(52, k)) + "."; },
-    poisson: function (q) { var m = q.match(/averaging ([\d.]+) per hour\. What is the probability of exactly (\d+) events/); if (!m) return; var L = +m[1], k = +m[2];
+    poisson: function (q) { var m = q.match(/averaging ([\d.]+) per hour\. What is the probability of exactly (\d+) events?/); if (!m) return; var L = +m[1], k = +m[2];
       return "A Poisson count with mean λ = " + L + " has P(N = k) = e^(−λ) λ^k / k!. Here e^(−" + L + ") ≈ " + r4(Math.exp(-L)) + ", λ^" + k + " = " + fx(Math.pow(L, k)) + " and " + k + "! = " + fact(k) + ", giving ≈ " + r4(Math.exp(-L) * Math.pow(L, k) / fact(k)) + "."; },
     sharpe: function (q) { var m = q.match(/averages (\d+) basis points a day with daily volatility ([\d.]+)%/); if (!m) return; var mu = +m[1] / 100, sd = +m[2], d = mu / sd;
       return "Daily Sharpe = mean ÷ volatility = " + fx(mu) + "% / " + sd + "% = " + fx(d) + ". Over a year the mean grows with the number of days (×252) but volatility only with its square root (×√252), so the ratio grows by √252 ≈ 15.87: " + fx(d) + " × 15.87 ≈ " + r4(d * Math.sqrt(252)) + "."; },
