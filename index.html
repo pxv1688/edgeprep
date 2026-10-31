@@ -30,8 +30,8 @@
 <script>try{var t=localStorage.getItem("edge-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
-<link rel="stylesheet" href="assets/edge.css?v=202610311734">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
+<link rel="stylesheet" href="assets/edge.css?v=202610311753">
 </head>
 <body class="landing">
 <a class="skip" href="#main">Skip to content</a>
@@ -54,6 +54,8 @@
     <div class="lp-sec hero2">
       <h1 id="hh" class="sr">Quant interviews, one square a day.</h1>
       <div class="board" id="board" aria-hidden="true"></div>
+      <script>/* reserve the board's height before landing.js builds it, so nothing below jumps (mirrors buildBoard) */
+      (function(){var b=document.getElementById("board"),W=b.clientWidth;if(!W)return;var m=W>=900?56:W>=600?44:30,c=Math.max(10,Math.min(18,Math.floor(W/m))),r=1,n=0;["QUANT","INTERVIEWS","ONE","SQUARE","A","DAY"].forEach(function(w){var need=(n?1:0)+w.length;if(n+need>c){r++;n=w.length}else n+=need});r++;var s=(W-(c-1)*2)/c;b.style.minHeight=(r*s+(r-1)*2)+"px"})();</script>
       <div class="hero-foot">
         <p class="hero-lede">A daily puzzle book for quant interviews. <b class="num" data-count="all">3,500+</b> problems in probability, brainteasers, options, statistics, code and mental math, every one with a worked explanation, plus timed games built like the online tests trading firms send.</p>
         <div class="stack hero-act">
@@ -198,12 +200,12 @@
   <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
 </footer>
 
-<script src="assets/data.js?v=202610311734"></script>
-<script src="assets/generators.js?v=202610311734"></script>
-<script src="assets/config.js?v=202610311734"></script>
+<script src="assets/data.js?v=202610311753"></script>
+<script src="assets/generators.js?v=202610311753"></script>
+<script src="assets/config.js?v=202610311753"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
-<script src="assets/auth.js?v=202610311734"></script>
-<script src="assets/site.js?v=202610311734"></script>
-<script src="assets/landing.js?v=202610311734"></script>
+<script src="assets/auth.js?v=202610311753"></script>
+<script src="assets/site.js?v=202610311753"></script>
+<script src="assets/landing.js?v=202610311753"></script>
 </body>
 </html>

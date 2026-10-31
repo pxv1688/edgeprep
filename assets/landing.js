@@ -64,6 +64,7 @@
     board.style.setProperty("--cols", cols);
     board.style.setProperty("--fs", Math.round(Math.min(W / cols, 72) * 0.58) + "px");
     board.innerHTML = html;
+    board.style.minHeight = ""; /* the inline reservation in index.html is no longer needed */
     /* letters are visible by default; the stamp-in only runs while the page is actually on screen */
     if (!reduced && document.visibilityState === "visible" && !buildBoard.played) {
       buildBoard.played = true;
