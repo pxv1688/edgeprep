@@ -4,7 +4,7 @@ def rd(p): return io.open(os.path.join(ROOT, p), encoding="utf-8").read()
 def wr(p, s):
     with io.open(os.path.join(ROOT, p), "w", encoding="utf-8", newline="") as f: f.write(s)
 
-CSP_META = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\' \'unsafe-inline\' https://cdn.jsdelivr.net https://gc.zgo.at; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src \'self\' data: https://*.goatcounter.com; connect-src \'self\' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; worker-src \'self\'; manifest-src \'self\'; object-src \'none\'; base-uri \'self\'; form-action \'self\'">\n<meta name="referrer" content="strict-origin-when-cross-origin">\n'
+CSP_META = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\' \'unsafe-inline\' https://cdn.jsdelivr.net https://gc.zgo.at https://accounts.google.com/gsi/client; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src \'self\' data: https://*.goatcounter.com; connect-src \'self\' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src \'self\'; manifest-src \'self\'; object-src \'none\'; base-uri \'self\'; form-action \'self\'">\n<meta name="referrer" content="strict-origin-when-cross-origin">\n'
 def head_meta(title, desc, noindex=False):
     return (
         CSP_META +

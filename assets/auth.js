@@ -23,6 +23,11 @@
     return need().then(function () { return sb.auth.signInWithOAuth({provider: "google", options: {redirectTo: base + "app.html"}}).then(unwrap); });
   };
   A.googleEnabled = !!cfg.googleSignIn;
+  A.googleClientId = cfg.googleClientId || "";
+  /* Google's own button hands back a signed ID token; Supabase verifies it, no redirect through supabase.co */
+  A.signInWithGoogleToken = function (token, nonce) {
+    return need().then(function () { return sb.auth.signInWithIdToken({provider: "google", token: token, nonce: nonce}).then(unwrap); });
+  };
   A.sendReset = function (email) { return need().then(function () { return sb.auth.resetPasswordForEmail(email, {redirectTo: base + "reset.html"}).then(unwrap); }); };
   A.updatePassword = function (password) { return need().then(function () { return sb.auth.updateUser({password: password}).then(unwrap); }); };
   A.signOut = function () { return need().then(function () { return sb.auth.signOut().then(unwrap); }); };

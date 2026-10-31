@@ -462,6 +462,7 @@ details.faq p{margin-top:8px;color:var(--ink);max-width:68ch}
 .btn.google{background:var(--paper);color:var(--ink);border-color:var(--rule);display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:460px}
 .btn.google:hover{background:var(--wash);color:var(--ink);border-color:var(--rule)}
 .btn.google .ico{width:20px;height:20px}
+.gis{width:100%;max-width:400px;min-height:44px;color-scheme:normal}
 .or{display:flex;align-items:center;gap:12px;max-width:460px;color:var(--muted);font:600 13px var(--body)}
 .or::before,.or::after{content:"";flex:1;height:2px;background:var(--hair)}
 
