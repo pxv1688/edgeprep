@@ -769,9 +769,15 @@
       e.preventDefault(); var fb = this.querySelector(".fb"), nm = $("#pf-n").value.trim(), yr = $("#pf-y").value.trim();
       if (nm.length < 2) { fb.className = "fb bad"; fb.textContent = "Display name needs at least 2 characters."; return; }
       if (yr && !/^20[2-4]\d$/.test(yr)) { fb.className = "fb bad"; fb.textContent = "Enter a year between 2020 and 2049, or leave it blank."; return; }
+      var before = S.profile && S.profile.name;
       S.profile = {name: nm, school: $("#pf-s").value.trim(), year: yr, role: $("#pf-r").value}; save(); paint();
       function done() { fb.className = "fb good"; fb.textContent = "Profile saved."; setTimeout(function () { $("#pEdit").hidden = true; fb.textContent = ""; }, 900); }
-      if (signedIn) window.EdgeAuth.saveProfile({display_name: nm, school: S.profile.school || null, grad_year: yr ? +yr : null, target_role: S.profile.role}).then(done, function (err) { fb.className = "fb bad"; fb.textContent = "Saved here, but couldn't sync: " + err.message; });
+      if (signedIn) window.EdgeAuth.saveProfile({display_name: nm, school: S.profile.school || null, grad_year: yr ? +yr : null, target_role: S.profile.role}).then(done, function (err) {
+        fb.className = "fb bad";
+        /* the server refuses names that aren't allowed on the public leaderboard */
+        if (/display name/i.test(err.message)) { S.profile.name = before || ""; save(); paint(); fb.textContent = err.message; }
+        else fb.textContent = "Saved here, but couldn't sync: " + err.message;
+      });
       else done();
     });
   };

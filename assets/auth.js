@@ -16,8 +16,32 @@
   function need() { if (!ok) return Promise.reject(new Error("Accounts aren't available yet.")); return Promise.resolve(); }
   function unwrap(r) { if (r.error) throw r.error; return r.data; }
 
-  A.signUp = function (email, password, displayName) { return need().then(function () { return sb.auth.signUp({email: email, password: password, options: {data: {display_name: displayName}, emailRedirectTo: base + "account.html"}}).then(unwrap); }); };
-  A.signIn = function (email, password) { return need().then(function () { return sb.auth.signInWithPassword({email: email, password: password}).then(unwrap); }); };
+  /* Cloudflare Turnstile bot check, required by Supabase for sign-up, sign-in and password resets once
+     its CAPTCHA protection is on. Usually invisible; a checkbox appears in #cfBox only for suspicious traffic.
+     Without turnstileSiteKey in config.js this resolves with no token and nothing changes. */
+  var cfWidget = null, cfWait = null;
+  A.captcha = function () {
+    if (!cfg.turnstileSiteKey) return Promise.resolve(undefined);
+    return new Promise(function (resolve, reject) {
+      function run() {
+        cfWait = {resolve: resolve, reject: reject};
+        if (cfWidget === null) {
+          var box = document.getElementById("cfBox");
+          if (!box) { box = document.createElement("div"); box.id = "cfBox"; document.body.appendChild(box); }
+          cfWidget = turnstile.render(box, {sitekey: cfg.turnstileSiteKey, execution: "execute", appearance: "interaction-only",
+            callback: function (t) { if (cfWait) cfWait.resolve(t); cfWait = null; },
+            "error-callback": function () { if (cfWait) cfWait.reject(new Error("The security check didn't load. Refresh the page and try again.")); cfWait = null; }});
+        } else turnstile.reset(cfWidget);
+        turnstile.execute(cfWidget);
+      }
+      if (window.turnstile) return run();
+      var s = document.createElement("script"); s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; s.async = true;
+      s.onload = run; s.onerror = function () { reject(new Error("The security check didn't load. Check your connection and try again.")); };
+      document.head.appendChild(s);
+    });
+  };
+  A.signUp = function (email, password, displayName) { return need().then(A.captcha).then(function (c) { return sb.auth.signUp({email: email, password: password, options: {data: {display_name: displayName}, emailRedirectTo: base + "account.html", captchaToken: c}}).then(unwrap); }); };
+  A.signIn = function (email, password) { return need().then(A.captcha).then(function (c) { return sb.auth.signInWithPassword({email: email, password: password, options: {captchaToken: c}}).then(unwrap); }); };
   /* one-click Google sign-in (enable the Google provider in Supabase first; see SETUP.md) */
   A.signInWithGoogle = function () {
     return need().then(function () { return sb.auth.signInWithOAuth({provider: "google", options: {redirectTo: base + "app.html"}}).then(unwrap); });
@@ -26,9 +50,9 @@
   A.googleClientId = cfg.googleClientId || "";
   /* Google's own button hands back a signed ID token; Supabase verifies it, no redirect through supabase.co */
   A.signInWithGoogleToken = function (token, nonce) {
-    return need().then(function () { return sb.auth.signInWithIdToken({provider: "google", token: token, nonce: nonce}).then(unwrap); });
+    return need().then(A.captcha).then(function (c) { return sb.auth.signInWithIdToken({provider: "google", token: token, nonce: nonce, options: {captchaToken: c}}).then(unwrap); });
   };
-  A.sendReset = function (email) { return need().then(function () { return sb.auth.resetPasswordForEmail(email, {redirectTo: base + "reset.html"}).then(unwrap); }); };
+  A.sendReset = function (email) { return need().then(A.captcha).then(function (c) { return sb.auth.resetPasswordForEmail(email, {redirectTo: base + "reset.html", captchaToken: c}).then(unwrap); }); };
   A.updatePassword = function (password) { return need().then(function () { return sb.auth.updateUser({password: password}).then(unwrap); }); };
   A.signOut = function () { return need().then(function () { return sb.auth.signOut().then(unwrap); }); };
   A.getProfile = function () { return need().then(function () { return sb.from("profiles").select("*").eq("id", A.user.id).maybeSingle().then(unwrap); }); };

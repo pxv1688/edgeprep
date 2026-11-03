@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sign in to Edge</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at https://accounts.google.com/gsi/client https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/ https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="Sign in or create a free Edge account to sync your quant interview practice.">
 <meta name="robots" content="noindex">
@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
-<link rel="stylesheet" href="assets/edge.css?v=202610311753">
+<link rel="stylesheet" href="assets/edge.css?v=202611022159">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -60,6 +60,7 @@
         <p class="fb" id="gFb" aria-live="polite"></p>
         <p class="or"><span>or use email</span></p>
       </div>
+      <div id="cfBox" class="cf"></div>
       <div class="tabs" role="tablist" aria-label="Account options">
         <button role="tab" id="t-in" aria-selected="true" aria-controls="p-in">Sign in</button>
         <button role="tab" id="t-up" aria-selected="false" aria-controls="p-up">Create account</button>
@@ -108,10 +109,10 @@
   <a href="terms.html">Terms</a>
   <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
 </footer>
-<script src="assets/config.js?v=202610311753"></script>
+<script src="assets/config.js?v=202611022159"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
-<script src="assets/auth.js?v=202610311753"></script>
-<script src="assets/site.js?v=202610311753"></script>
+<script src="assets/auth.js?v=202611022159"></script>
+<script src="assets/site.js?v=202611022159"></script>
 <script>
 (function () {
   var A = window.EdgeAuth;
@@ -136,7 +137,7 @@
         var box = document.getElementById("gGis"), dark = document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
         google.accounts.id.initialize({client_id: A.googleClientId, nonce: hashed, ux_mode: "popup", context: "signin", itp_support: true, callback: function (r) {
           gFb.className = "fb"; gFb.textContent = "Signing you in…";
-          A.signInWithGoogleToken(r.credential, raw).then(function () { location.href = "app.html#today"; }, function () { gFb.className = "fb bad"; gFb.textContent = "Google sign-in didn't go through. Try again, or use email."; });
+          A.signInWithGoogleToken(r.credential, raw).then(function () { location.href = "app.html#today"; }, function (err) { gFb.className = "fb bad"; gFb.textContent = check(err) || "Google sign-in didn't go through. Try again, or use email."; });
         }});
         box.hidden = false;
         google.accounts.id.renderButton(box, {type: "standard", theme: dark ? "filled_black" : "outline", size: "large", text: "continue_with", shape: "rectangular", logo_alignment: "center", width: Math.min(400, box.clientWidth || 400)});
@@ -152,12 +153,20 @@
   A.onChange(function (u) { if (u && A.lastEvent === "SIGNED_IN") location.href = "app.html#today"; });
   function say(form, msg, good) { var fb = form.querySelector(".fb"); fb.className = "fb " + (good ? "good" : "bad"); fb.textContent = msg; }
   function busy(form, on) { form.querySelector("button[type=submit]").disabled = on; }
+  /* the bot check failing, or too many attempts, gets its own message instead of "wrong password" */
+  function check(err) {
+    var m = (err && err.message) || "";
+    if (/security check/i.test(m)) return m;
+    if (/captcha/i.test(m)) return "The security check didn't pass. Refresh the page and try again.";
+    if (/rate limit|too many/i.test(m)) return "Too many attempts. Wait a few minutes and try again.";
+    return "";
+  }
   function valid(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
   document.getElementById("p-in").addEventListener("submit", function (e) {
     e.preventDefault(); var f = this, em = f.querySelector("#in-email").value.trim(), pw = f.querySelector("#in-pw").value;
     if (!valid(em) || !pw) return say(f, "Enter your email and password.");
     busy(f, true); say(f, "Signing in…", true);
-    A.signIn(em, pw).then(function () { location.href = "app.html#today"; }, function (err) { busy(f, false); say(f, /confirm/i.test(err.message) ? "Confirm your email first. Check your inbox for the link." : "That email and password don't match. Try again or reset your password."); });
+    A.signIn(em, pw).then(function () { location.href = "app.html#today"; }, function (err) { busy(f, false); say(f, check(err) || (/confirm/i.test(err.message) ? "Confirm your email first. Check your inbox for the link." : "That email and password don't match. Try again or reset your password.")); });
   });
   document.getElementById("p-up").addEventListener("submit", function (e) {
     e.preventDefault(); var f = this, nm = f.querySelector("#up-name").value.trim(), em = f.querySelector("#up-email").value.trim(), pw = f.querySelector("#up-pw").value;
@@ -169,13 +178,13 @@
     A.signUp(em, pw, nm).then(function (d) {
       if (d && d.session) location.href = "app.html#today";
       else { say(f, "Almost done. We sent a confirmation link to " + em + ". Open it to finish signing up.", true); }
-    }, function (err) { busy(f, false); say(f, /registered|exists/i.test(err.message) ? "That email already has an account. Sign in instead." : "Couldn't create the account: " + err.message); });
+    }, function (err) { busy(f, false); say(f, check(err) || (/registered|exists/i.test(err.message) ? "That email already has an account. Sign in instead." : "Couldn't create the account: " + err.message)); });
   });
   document.getElementById("p-re").addEventListener("submit", function (e) {
     e.preventDefault(); var f = this, em = f.querySelector("#re-email").value.trim();
     if (!valid(em)) return say(f, "Enter a valid email address.");
     busy(f, true);
-    A.sendReset(em).then(function () { say(f, "If an account exists for " + em + ", a reset link is on its way.", true); }, function () { busy(f, false); say(f, "Couldn't send the link right now. Try again in a minute."); });
+    A.sendReset(em).then(function () { say(f, "If an account exists for " + em + ", a reset link is on its way.", true); }, function (err) { busy(f, false); say(f, check(err) || "Couldn't send the link right now. Try again in a minute."); });
   });
 })();
 </script>

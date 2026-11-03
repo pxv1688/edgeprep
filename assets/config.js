@@ -8,6 +8,9 @@
    googleClientId: the Web client ID from Google Cloud. With it, sign-in happens on this site in a Google popup,
    so people see your domain instead of the supabase.co address.
 
+   turnstileSiteKey: the public site key of a Cloudflare Turnstile widget. Turns on the bot check for sign-up,
+   sign-in and password resets; Supabase needs the matching secret key under Authentication > Attack Protection.
+
    goatcounter: your GoatCounter site code (the "edge" in edge.goatcounter.com) for cookie-free visitor stats.
    Leave empty to turn analytics off. See SETUP.md, "Visitor stats". */
 window.EDGE_CONFIG = {
@@ -15,5 +18,6 @@ window.EDGE_CONFIG = {
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhYm5yeXBseHJpaXJjaXVzeWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NDQ1ODYsImV4cCI6MjEwNzQyMDU4Nn0.bwcFpEP1MtvK3YgNpo2HGUb-DYxZIy-DGeyu3bXP8iw",
   googleSignIn: true,
   googleClientId: "682512300052-g0tldultuluidg9pmp1notcj2n3p5p1g.apps.googleusercontent.com",
+  turnstileSiteKey: "0x4AAAAAAFxgxnlUZ54grMLn",
   goatcounter: "edgeprep"
 };

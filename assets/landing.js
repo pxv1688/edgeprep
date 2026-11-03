@@ -176,7 +176,7 @@
       form.querySelector("button").disabled = true; fb.className = "fb"; fb.textContent = "Subscribing…";
       A.subscribe(em, "landing").then(function (r) {
         fb.className = "fb good"; fb.textContent = r === "exists" ? "You're already subscribed." : "You're on the list. Your first recap arrives Sunday.";
-      }, function () { form.querySelector("button").disabled = false; fb.className = "fb bad"; fb.textContent = "Couldn't subscribe right now. Try again in a minute."; });
+      }, function (err) { form.querySelector("button").disabled = false; fb.className = "fb bad"; fb.textContent = /too many/i.test(err && err.message) ? err.message : "Couldn't subscribe right now. Try again in a minute."; });
     });
   }
 

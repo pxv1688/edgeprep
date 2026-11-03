@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Edge Privacy Policy</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://gc.zgo.at https://accounts.google.com/gsi/client https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.goatcounter.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.goatcounter.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/ https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="How Edge handles your data. No ads, no trackers, no cookies.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap"></noscript>
-<link rel="stylesheet" href="assets/edge.css?v=202610311753">
+<link rel="stylesheet" href="assets/edge.css?v=202611022159">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -49,7 +49,7 @@
 <main id="main" tabindex="-1">
 <article class="doc">
   <h1>Privacy Policy</h1>
-  <p class="sub" style="margin-top:10px">Last updated: October 10, 2026</p>
+  <p class="sub" style="margin-top:10px">Last updated: November 2, 2026</p>
 
   <h2>The short version</h2>
   <p>Edge has no ads, no tracking cookies and no cross-site trackers. We count visits with a privacy-friendly tool that doesn't use cookies. You can practice without an account. If you create one, we store only what's needed to run it: your email, your profile and your practice progress.</p>
@@ -80,6 +80,10 @@
   <h2>Weekly puzzle email</h2>
   <p>If you subscribe, we store your email address, when you subscribed and where you signed up. We use it only to send the weekly puzzle, never for anything else, and we never sell or share it. Every email includes a way to unsubscribe, or you can contact us to be removed.</p>
 
+  <h2>Keeping out spam and bots</h2>
+  <p>Signing up, signing in and resetting a password run a quick bot check from Cloudflare Turnstile. It's usually invisible; occasionally it asks you to tick a box. Cloudflare processes technical details from your browser, such as your IP address, to tell people from bots, and doesn't use them for advertising.</p>
+  <p>To stop the feedback and email forms being flooded, we keep a one-way hash of your IP address and the date for 24 hours each time you send one. We can't turn the hash back into your address, and it's deleted after a day.</p>
+
   <h2 id="your-data">Downloading and deleting your data</h2>
   <ul>
     <li><b>Download:</b> Profile → Your data → Download my data saves everything Edge stores about your practice as a file.</li>
@@ -96,6 +100,7 @@
     <li><b>Supabase</b> stores account data. See <a href="https://supabase.com/privacy" rel="noopener">Supabase's privacy policy</a>.</li>
     <li><b>GoatCounter</b> provides cookie-free visitor statistics. See <a href="https://www.goatcounter.com/help/privacy" rel="noopener">GoatCounter's privacy policy</a>.</li>
     <li><b>Google</b> handles sign-in if you choose "Continue with Google".</li>
+    <li><b>Cloudflare</b> hosts the site and runs the Turnstile bot check. See <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.</li>
     <li><b>Google Fonts</b> serves our typeface. Your browser's request reveals your IP address to Google, as described in <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy</a>.</li>
     <li><b>jsDelivr</b> serves the Supabase code library.</li>
     <li>Our <b>hosting provider</b> may keep standard server logs, such as IP addresses and request times.</li>
@@ -128,9 +133,9 @@
   <a href="terms.html">Terms</a>
   <label class="theme">Theme <select id="themeSel"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
 </footer>
-<script src="assets/config.js?v=202610311753"></script>
+<script src="assets/config.js?v=202611022159"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
-<script src="assets/auth.js?v=202610311753"></script>
-<script src="assets/site.js?v=202610311753"></script>
+<script src="assets/auth.js?v=202611022159"></script>
+<script src="assets/site.js?v=202611022159"></script>
 </body>
 </html>
