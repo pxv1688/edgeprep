@@ -1,0 +1,9 @@
+# Cloudflare Pages response headers (netlify.toml holds the same rules for Netlify)
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+
+# every page links scripts and styles with a ?v= version stamp (tools/bump_version.py), so they can be cached for a year
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

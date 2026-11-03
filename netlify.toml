@@ -32,6 +32,13 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+# The site moved to getedgeprep.com (Cloudflare Pages); keep old links and bookmarks working
+[[redirects]]
+  from = "https://edgeprep.netlify.app/*"
+  to = "https://getedgeprep.com/:splat"
+  status = 301
+  force = true
+
 # Unknown URLs show the site's 404 page
 [[redirects]]
   from = "/*"
